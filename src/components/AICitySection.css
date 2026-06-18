@@ -1,0 +1,275 @@
+/* =====================================================
+   AI CITY SECTION — Futuristic second viewport section
+   ===================================================== */
+
+.ai-city-section {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+  padding: 0 24px;
+  gap: 52px;
+}
+
+/* ---- Section Heading ---- */
+.ai-city-heading {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  will-change: transform, opacity;
+}
+
+.ai-city-tagline {
+  font-family: var(--font-cyber);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 5px;
+  color: var(--primary-glow);
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  text-transform: uppercase;
+  animation: pulse 2s infinite ease-in-out;
+}
+
+.ai-city-title {
+  font-family: var(--font-cyber);
+  font-size: clamp(48px, 9vw, 100px);
+  font-weight: 900;
+  letter-spacing: 16px;
+  color: #fff;
+  text-transform: uppercase;
+  line-height: 1;
+  padding-left: 16px;
+  animation: glow-pulse 4s infinite ease-in-out;
+}
+
+.ai-city-subtitle {
+  font-family: var(--font-cyber);
+  font-size: clamp(11px, 2vw, 16px);
+  font-weight: 400;
+  letter-spacing: 6px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-style: italic;
+}
+
+/* ---- Cards Container ---- */
+.ai-city-cards {
+  display: flex;
+  gap: 28px;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
+  max-width: 1100px;
+  width: 100%;
+}
+
+/* ---- Card Float Wrapper ---- */
+.floating-card-wrapper {
+  flex: 1;
+  min-width: 260px;
+  max-width: 340px;
+  will-change: transform;
+}
+
+.floating-card-wrapper:nth-child(1) {
+  animation: card-float 6s ease-in-out infinite;
+}
+.floating-card-wrapper:nth-child(2) {
+  animation: card-float 7s ease-in-out infinite;
+  animation-delay: 2s;
+}
+.floating-card-wrapper:nth-child(3) {
+  animation: card-float 6.5s ease-in-out infinite;
+  animation-delay: 4s;
+}
+
+@keyframes card-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+/* ---- Floating Glass Card ---- */
+.floating-card {
+  position: relative;
+  background: rgba(12, 6, 24, 0.35);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 36px 28px 32px;
+  text-align: center;
+  cursor: none;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  height: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25),
+              inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Gradient overlay on hover */
+.floating-card__gradient-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 240, 255, 0.04) 0%,
+    transparent 50%,
+    rgba(189, 0, 255, 0.04) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  border-radius: 20px;
+}
+
+.floating-card:hover .floating-card__gradient-bg {
+  opacity: 1;
+}
+
+/* Hover effects: tilt, glow, border */
+.floating-card:hover {
+  transform: perspective(800px) rotateX(2deg) rotateY(-3deg) scale(1.04);
+  border-color: rgba(0, 240, 255, 0.25);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.35),
+    0 0 30px rgba(0, 240, 255, 0.12),
+    0 0 60px rgba(189, 0, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Card Icon */
+.floating-card__icon {
+  width: 48px;
+  height: 48px;
+  color: var(--primary-glow);
+  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.4));
+  transition: all 0.4s ease;
+}
+
+.floating-card__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.floating-card:hover .floating-card__icon {
+  color: #fff;
+  filter: drop-shadow(0 0 14px rgba(0, 240, 255, 0.7));
+  transform: scale(1.12);
+}
+
+/* Card Title */
+.floating-card__title {
+  font-family: var(--font-cyber);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  transition: text-shadow 0.4s ease;
+}
+
+.floating-card:hover .floating-card__title {
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+}
+
+/* Card Description */
+.floating-card__description {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.75;
+  color: var(--text-muted);
+  letter-spacing: 0.4px;
+}
+
+/* Card Shine Sweep */
+.floating-card__shine {
+  position: absolute;
+  top: -80%;
+  left: -80%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.025) 50%,
+    transparent 58%
+  );
+  transform: rotate(45deg);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.floating-card:hover .floating-card__shine {
+  transform: rotate(45deg) translate(60%, 60%);
+}
+
+/* HUD Corner Accents on Cards */
+.fc-hud-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  pointer-events: none;
+  transition: border-color 0.4s ease;
+}
+
+.floating-card:hover .fc-hud-corner {
+  border-color: rgba(0, 240, 255, 0.4);
+}
+
+.fc-hud-tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+.fc-hud-tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+.fc-hud-bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+.fc-hud-br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+/* ---- HUD Frame for AI City Section ---- */
+.ai-city-hud-frame {
+  position: absolute;
+  top: 40px;
+  bottom: 40px;
+  left: 40px;
+  right: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  pointer-events: none;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 900px) {
+  .ai-city-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .floating-card-wrapper {
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .ai-city-section {
+    gap: 36px;
+  }
+}
+
+@media (max-width: 600px) {
+  .ai-city-title {
+    letter-spacing: 8px;
+  }
+
+  .ai-city-subtitle {
+    letter-spacing: 3px;
+  }
+}

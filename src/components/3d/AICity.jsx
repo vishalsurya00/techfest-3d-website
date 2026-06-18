@@ -6,9 +6,9 @@ import Hologram from './Hologram';
 import EnergyRoad from './EnergyRoad';
 
 const AICity = ({ scrollProgress = 0 }) => {
-  // 1. Calculate opacity fade-in based on scroll progress (enters between 0.53 and 0.72)
+  // 1. Calculate opacity fade-in based on scroll progress (city appears during phase 2)
   const cityOpacity = useMemo(() => {
-    return THREE.MathUtils.smoothstep(scrollProgress, 0.53, 0.72);
+    return THREE.MathUtils.smoothstep(scrollProgress, 0.5, 0.7);
   }, [scrollProgress]);
 
   // 2. Generate building grid parameters (runs unconditionally before any returns)

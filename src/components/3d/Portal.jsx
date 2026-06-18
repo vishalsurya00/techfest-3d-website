@@ -8,9 +8,13 @@ const Portal = ({ scrollProgress = 0 }) => {
   const pointsRef = useRef();
   const lightRef = useRef();
 
-  // 1. Calculate portal opacity (fades in between scroll progress 0.25 and 0.7)
+  // 1. Calculate portal opacity: fades in during hero phase, fades out as camera passes through
   const portalOpacity = useMemo(() => {
-    return THREE.MathUtils.smoothstep(scrollProgress, 0.25, 0.7);
+    const heroPhase = Math.min(1, scrollProgress * 2);
+    const appear = THREE.MathUtils.smoothstep(heroPhase, 0.25, 0.7);
+    // Fade out after camera passes through portal into city
+    const fadeOut = 1 - THREE.MathUtils.smoothstep(scrollProgress, 0.55, 0.75);
+    return appear * fadeOut;
   }, [scrollProgress]);
 
   // 2. Swirling energy disc ShaderMaterial

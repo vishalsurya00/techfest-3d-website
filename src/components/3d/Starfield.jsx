@@ -46,8 +46,9 @@ const Starfield = ({ scrollProgress = 0 }) => {
     const { clock } = state;
     const time = clock.getElapsedTime();
 
-    // Warp speed peaks at 0.5 scroll progress, then slows to a stop at 1.0 (arrival at portal)
-    const warpIntensity = Math.sin(scrollProgress * Math.PI);
+    // Warp peaks during hero-to-portal phase, then calms down for city section
+    const heroPhase = Math.min(1, scrollProgress * 2);
+    const warpIntensity = Math.sin(heroPhase * Math.PI);
     const targetWarp = warpIntensity * 40.0;
     
     uniforms.uWarpSpeed.value += (targetWarp - uniforms.uWarpSpeed.value) * 0.08;

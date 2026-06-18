@@ -33,7 +33,7 @@ body {
   font-family: var(--font-body);
   overflow-y: auto; /* Enable vertical scroll */
   overflow-x: hidden;
-  min-height: 200vh; /* Exactly 200vh height to support scroll transition */
+  min-height: 300vh; /* 300vh: Hero (100vh) + Portal transition + AI City (100vh) */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   cursor: none; /* Hide default cursor to use glowing trail */
@@ -185,7 +185,9 @@ a, button {
 .hero-footer,
 .enter-btn,
 .nav-link,
-.nav-console-btn {
+.nav-console-btn,
+.ai-city-section,
+.floating-card {
   pointer-events: auto;
 }
 

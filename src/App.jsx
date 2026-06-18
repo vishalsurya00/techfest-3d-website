@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Scene from './components/3d/Scene';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
+import AICitySection from './components/AICitySection';
 import CustomCursor from './components/CustomCursor';
 
 function App() {
@@ -21,10 +22,16 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Calculate Portal Title opacity and vertical slide translation
-  // Starts fading/sliding in at scrollProgress = 0.75, fully active at 1.0
-  const portalTitleOpacity = Math.max(0, Math.min(1, (scrollProgress - 0.75) * 4.0));
-  const portalTitleTranslateY = 20 - Math.min(20, (scrollProgress - 0.75) * 80);
+  // Derive per-section progress (0-1 within each section's scroll range)
+  // scrollProgress 0.0→0.5 = Hero section | scrollProgress 0.5→1.0 = AI City section
+  const heroProgress = Math.min(1, Math.max(0, scrollProgress * 2));
+  const cityProgress = Math.min(1, Math.max(0, (scrollProgress - 0.5) * 2));
+
+  // Portal Title: appears near end of hero phase, fades as city phase begins
+  const portalFadeIn = Math.max(0, Math.min(1, (scrollProgress - 0.35) * 10));
+  const portalFadeOut = Math.max(0, Math.min(1, 1 - (scrollProgress - 0.5) * 10));
+  const portalTitleOpacity = portalFadeIn * portalFadeOut;
+  const portalTitleTranslateY = 20 - portalFadeIn * 20;
 
   return (
     <>
@@ -39,9 +46,12 @@ function App() {
         <Navbar />
 
         {/* HUD Hero Section Layer */}
-        <HeroSection scrollProgress={scrollProgress} />
+        <HeroSection scrollProgress={heroProgress} />
 
-        {/* Portal Title Overlay */}
+        {/* AI City Section (scroll-animated 3D city overlay) */}
+        <AICitySection scrollProgress={cityProgress} />
+
+        {/* Portal Title Overlay (fixed, transitions between sections) */}
         <div 
           className="portal-title-overlay"
           style={{
