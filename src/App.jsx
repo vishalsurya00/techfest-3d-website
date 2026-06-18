@@ -20,10 +20,10 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Calculate AI City Title opacity and vertical slide translation
-  // Starts fading/sliding in at scrollProgress = 0.78, fully active at 0.98
-  const cityTitleOpacity = Math.max(0, Math.min(1, (scrollProgress - 0.78) * 5.0));
-  const cityTitleTranslateY = 20 - Math.min(20, (scrollProgress - 0.78) * 100);
+  // Calculate Portal Title opacity and vertical slide translation
+  // Starts fading/sliding in at scrollProgress = 0.75, fully active at 1.0
+  const portalTitleOpacity = Math.max(0, Math.min(1, (scrollProgress - 0.75) * 4.0));
+  const portalTitleTranslateY = 20 - Math.min(20, (scrollProgress - 0.75) * 80);
 
   return (
     <div className="fade-in-load">
@@ -39,17 +39,24 @@ function App() {
       {/* HUD Hero Section Layer */}
       <HeroSection scrollProgress={scrollProgress} />
 
-      {/* AI City Title Overlay */}
+      {/* Portal Title Overlay */}
       <div 
-        className="city-title-overlay"
+        className="portal-title-overlay"
         style={{
-          opacity: cityTitleOpacity,
-          transform: `translate(-50%, calc(-50% + ${cityTitleTranslateY}px))`,
-          pointerEvents: cityTitleOpacity > 0.1 ? 'auto' : 'none'
+          opacity: portalTitleOpacity,
+          transform: `translate(-50%, calc(-50% + ${portalTitleTranslateY}px))`,
+          pointerEvents: portalTitleOpacity > 0.1 ? 'auto' : 'none'
         }}
       >
-        <h1 className="city-title">AI CITY</h1>
-        <p className="city-subtitle">"Where Intelligence Comes Alive"</p>
+        <h1 className="portal-title">ENTER THE AI DIMENSION</h1>
+        <div className="portal-scroll-indicator">
+          Continue Scrolling
+          <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'center' }}>
+            <svg className="down-arrow-svg" viewBox="0 0 24 24" fill="none" style={{ width: '18px', height: '18px' }}>
+              <path d="M7 13l5 5 5-5M7 6l5 5 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        </div>
       </div>
     </div>
   );

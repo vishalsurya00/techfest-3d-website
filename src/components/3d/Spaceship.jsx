@@ -77,15 +77,15 @@ const Spaceship = ({ scrollProgress = 0 }) => {
     // centered relative to the scene at [0, -0.85, -2.5] in camera space
     // Let's translate it into world space relative to the camera
     const cam = state.camera;
-    const posWarp = new THREE.Vector3(0, -0.85, -2.6).applyMatrix4(cam.matrixWorld);
+    const posWarp = new THREE.Vector3(0, -0.85, -3.2).applyMatrix4(cam.matrixWorld);
 
-    // Define Position 3: City Hover / Orbit
-    // City is centered at [0, -9.0, -60]. Spaceship orbits the center
-    const cityOrbitRadius = 3.5;
-    const cityX = Math.cos(data.theta * 0.8) * cityOrbitRadius;
-    const cityZ = -60 + Math.sin(data.theta * 0.8) * cityOrbitRadius;
-    const cityY = -7.5 + Math.sin(data.theta * 1.2) * 0.3; // hover above platform
-    const posCity = new THREE.Vector3(cityX, cityY, cityZ);
+    // Define Position 3: Portal Hover / Orbit
+    // Portal is centered at [0, 0, -6.0]
+    const portalRadius = 1.3;
+    const portalX = Math.cos(data.theta * 0.8) * portalRadius;
+    const portalZ = -6.0 + Math.sin(data.theta * 0.8) * portalRadius;
+    const portalY = Math.sin(data.theta * 1.2) * 0.3; // gentle hover wave
+    const posPortalOrbit = new THREE.Vector3(portalX, portalY, portalZ);
 
     // 3. Blend positions based on scroll progress
     let finalPos = new THREE.Vector3();
@@ -95,7 +95,7 @@ const Spaceship = ({ scrollProgress = 0 }) => {
     // Thruster scale factors
     let thrusterScale = 1.0;
 
-    if (scrollProgress < 0.2) {
+    if (scrollProgress < 0.25) {
       // Phase 1: Normal Earth Orbit
       finalPos.copy(posOrbit);
       
@@ -103,9 +103,9 @@ const Spaceship = ({ scrollProgress = 0 }) => {
       const tangentZ = Math.cos(data.theta) * orbitRadius;
       const tangentY = Math.cos(data.theta * 1.5) * 0.4 * 1.5;
       targetLook.set(orbitX + tangentX, orbitY + tangentY, orbitZ + tangentZ);
-    } else if (scrollProgress >= 0.2 && scrollProgress < 0.38) {
+    } else if (scrollProgress >= 0.25 && scrollProgress < 0.45) {
       // Transition from Orbit to Warp
-      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.2, 0.38);
+      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.25, 0.45);
       finalPos.lerpVectors(posOrbit, posWarp, t);
       
       // Look direction blends to forward (facing away from camera)
@@ -116,35 +116,35 @@ const Spaceship = ({ scrollProgress = 0 }) => {
       const orbitLook = new THREE.Vector3(orbitX + tangentX, orbitY + tangentY, orbitZ + tangentZ);
       
       targetLook.lerpVectors(orbitLook, forwardDir, t);
-      thrusterScale = 1.0 + t * 3.5; // Fire booster
+      thrusterScale = 1.0 + t * 4.5; // Fire booster
       isWarping = true;
-    } else if (scrollProgress >= 0.38 && scrollProgress < 0.58) {
+    } else if (scrollProgress >= 0.45 && scrollProgress < 0.7) {
       // Phase 2: Full Warp (centered in front of camera)
       finalPos.copy(posWarp);
       targetLook.set(0, 0, -5).applyQuaternion(cam.quaternion).add(finalPos);
-      thrusterScale = 4.5 + Math.sin(time * 25.0) * 0.4; // Pulsing warp drive
+      thrusterScale = 5.5 + Math.sin(time * 25.0) * 0.5; // Pulsing warp drive
       isWarping = true;
-    } else if (scrollProgress >= 0.58 && scrollProgress < 0.75) {
-      // Transition from Warp to City
-      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.58, 0.75);
-      finalPos.lerpVectors(posWarp, posCity, t);
+    } else if (scrollProgress >= 0.7 && scrollProgress < 0.85) {
+      // Transition from Warp to Portal Orbit
+      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.7, 0.85);
+      finalPos.lerpVectors(posWarp, posPortalOrbit, t);
       
-      const cityTangentX = -Math.sin(data.theta * 0.8) * cityOrbitRadius;
-      const cityTangentZ = Math.cos(data.theta * 0.8) * cityOrbitRadius;
-      const cityTangentY = Math.cos(data.theta * 1.2) * 0.3 * 1.2;
-      const cityLook = new THREE.Vector3(cityX + cityTangentX, cityY + cityTangentY, cityZ + cityTangentZ);
+      const portalTangentX = -Math.sin(data.theta * 0.8) * portalRadius;
+      const portalTangentZ = Math.cos(data.theta * 0.8) * portalRadius;
+      const portalTangentY = Math.cos(data.theta * 1.2) * 0.3 * 1.2;
+      const portalLook = new THREE.Vector3(portalX + portalTangentX, portalY + portalTangentY, portalZ + portalTangentZ);
       const forwardDir = new THREE.Vector3(0, 0, -5).applyQuaternion(cam.quaternion).add(finalPos);
 
-      targetLook.lerpVectors(forwardDir, cityLook, t);
-      thrusterScale = 4.5 - t * 3.5; // Decelerate booster
+      targetLook.lerpVectors(forwardDir, portalLook, t);
+      thrusterScale = 5.5 - t * 4.5; // Decelerate booster
     } else {
-      // Phase 3: City Arrival Hover
-      finalPos.copy(posCity);
+      // Phase 3: Portal Orbit Hover
+      finalPos.copy(posPortalOrbit);
       
-      const cityTangentX = -Math.sin(data.theta * 0.8) * cityOrbitRadius;
-      const cityTangentZ = Math.cos(data.theta * 0.8) * cityOrbitRadius;
-      const cityTangentY = Math.cos(data.theta * 1.2) * 0.3 * 1.2;
-      targetLook.set(cityX + cityTangentX, cityY + cityTangentY, cityZ + cityTangentZ);
+      const portalTangentX = -Math.sin(data.theta * 0.8) * portalRadius;
+      const portalTangentZ = Math.cos(data.theta * 0.8) * portalRadius;
+      const portalTangentY = Math.cos(data.theta * 1.2) * 0.3 * 1.2;
+      targetLook.set(portalX + portalTangentX, portalY + portalTangentY, portalZ + portalTangentZ);
       thrusterScale = 1.0 + Math.sin(time * 5.0) * 0.1;
     }
 

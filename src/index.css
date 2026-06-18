@@ -31,8 +31,9 @@ body {
   background-color: var(--bg-dark);
   color: var(--text-primary);
   font-family: var(--font-body);
-  overflow: hidden; /* Prevent scrolling entirely */
-  height: 100vh;
+  overflow-y: auto; /* Enable vertical scroll */
+  overflow-x: hidden;
+  min-height: 200vh; /* Exactly 200vh height to support scroll transition */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   cursor: none; /* Hide default cursor to use glowing trail */
@@ -228,6 +229,54 @@ a, button {
   letter-spacing: 6px;
   color: var(--text-secondary);
   text-transform: uppercase;
+}
+
+/* Portal Title Overlay */
+.portal-title-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 100;
+  pointer-events: none;
+  font-family: var(--font-cyber);
+  will-change: transform, opacity;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 90%;
+  max-width: 800px;
+}
+
+.portal-title {
+  font-size: clamp(28px, 6vw, 68px);
+  font-weight: 900;
+  letter-spacing: 12px;
+  color: #ffffff;
+  text-transform: uppercase;
+  text-shadow: 0 0 15px rgba(0, 240, 255, 0.6),
+               0 0 30px rgba(189, 0, 255, 0.4);
+  animation: glow-pulse 4s infinite ease-in-out;
+}
+
+.portal-subtitle {
+  font-size: clamp(10px, 1.8vw, 14px);
+  font-weight: 500;
+  letter-spacing: 5px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.portal-scroll-indicator {
+  margin-top: 24px;
+  font-size: clamp(9px, 1.5vw, 12px);
+  font-weight: 500;
+  letter-spacing: 4px;
+  color: var(--primary-glow);
+  text-transform: uppercase;
+  animation: pulse 2s infinite ease-in-out;
 }
 
 

@@ -46,9 +46,10 @@ const Starfield = ({ scrollProgress = 0 }) => {
     const { clock } = state;
     const time = clock.getElapsedTime();
 
-    // Lerp warp speed multiplier based on scroll progress
-    // When scrolling, warp speed goes up significantly
-    const targetWarp = scrollProgress > 0.05 ? scrollProgress * 45.0 : 0.0;
+    // Warp speed peaks at 0.5 scroll progress, then slows to a stop at 1.0 (arrival at portal)
+    const warpIntensity = Math.sin(scrollProgress * Math.PI);
+    const targetWarp = warpIntensity * 40.0;
+    
     uniforms.uWarpSpeed.value += (targetWarp - uniforms.uWarpSpeed.value) * 0.08;
     uniforms.uScrollProgress.value = scrollProgress;
     uniforms.uTime.value = time;

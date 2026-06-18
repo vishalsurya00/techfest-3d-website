@@ -1,12 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import Starfield from './Starfield';
 import Nebula from './Nebula';
 import Earth from './Earth';
 import Spaceship from './Spaceship';
-import HyperspaceTunnel from './HyperspaceTunnel';
-import AICity from './AICity';
+import Portal from './Portal';
 
 // Inner component to access R3F hooks (useFrame, useThree)
 const SceneContent = ({ scrollProgress = 0 }) => {
@@ -29,79 +28,39 @@ const SceneContent = ({ scrollProgress = 0 }) => {
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
 
-    // 1. Camera Positions & Targets interpolation across scroll timeline
+    // 1. Camera Positions & Targets interpolation across scroll timeline (0.0 to 1.0)
     let targetCamPos = new THREE.Vector3();
     let targetLookAt = new THREE.Vector3();
     let shakeIntensity = 0;
 
     // Define color variables for fog interpolation
     const spaceColor = new THREE.Color('#05020a');
-    const tunnelColor = new THREE.Color('#100525');
-    const cityColor = new THREE.Color('#080417');
+    const portalColor = new THREE.Color('#09041a');
 
     let currentFogColor = new THREE.Color();
     let currentFogDensity = 0.0018;
 
-    if (scrollProgress < 0.2) {
-      // Phase 1: Earth Orbit
-      // Camera is close, viewing Earth on the left
-      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.0, 0.2);
-      const z = THREE.MathUtils.lerp(5.8, 5.0, t);
-      
-      targetCamPos.set(0, 0, z);
-      targetLookAt.set(0, 0, -5.0); // Facing straight
+    // Smoothed transition progress
+    const t = THREE.MathUtils.smoothstep(scrollProgress, 0.0, 1.0);
 
-      currentFogColor.copy(spaceColor);
-      currentFogDensity = 0.0018;
-    } else if (scrollProgress >= 0.2 && scrollProgress < 0.6) {
-      // Phase 2: Hyperspace Warp Jump
-      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.2, 0.6);
-      
-      // Camera flies rapidly forward into the tunnel (z drops from 5.0 to 1.5)
-      const z = THREE.MathUtils.lerp(5.0, 1.5, t);
-      targetCamPos.set(0, 0, z);
-      targetLookAt.set(0, 0, -5.0); // Pointing forward
+    // Camera moves forward from z=5.8 to z=1.2 (in front of portal at z=-6.0)
+    const z = THREE.MathUtils.lerp(5.8, 1.2, t);
+    targetCamPos.set(0, 0, z);
+    
+    // Camera is looking straight forward towards the portal center at [0, 0, -6.0]
+    targetLookAt.set(0, 0, -6.0);
 
-      // Compute screen shake (bell-curve peaking in the middle of acceleration)
-      shakeIntensity = Math.sin(t * Math.PI) * 0.09;
+    // Compute screen shake (bell-curve peaking around the middle warp, scrollProgress 0.2 to 0.8)
+    const shakeProgress = THREE.MathUtils.smoothstep(scrollProgress, 0.2, 0.85);
+    shakeIntensity = Math.sin(shakeProgress * Math.PI) * 0.022;
 
-      // Blend fog to deep tunnel violet
-      currentFogColor.lerpColors(spaceColor, tunnelColor, t);
-      currentFogDensity = THREE.MathUtils.lerp(0.0018, 0.006, t);
-    } else {
-      // Phase 3: AI City Arrival
-      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.6, 1.0);
-      
-      // Camera exits the tunnel, rises up, and angles down to overlook the city
-      // final camera overlooks the city at [0, 4.5, -30] looking towards [0, -9.0, -60.0]
-      const startX = 0;
-      const targetX = 0;
-      const startY = 0;
-      const targetY = 5.2; // Elevate camera view
-      const startZ = 1.5;
-      const targetZ = -34.0; // Fly close to city edge
-
-      const x = THREE.MathUtils.lerp(startX, targetX, t);
-      const y = THREE.MathUtils.lerp(startY, targetY, t);
-      const z = THREE.MathUtils.lerp(startZ, targetZ, t);
-
-      targetCamPos.set(x, y, z);
-      
-      // Blend camera look-at from forward vector to looking down at city core
-      const startLook = new THREE.Vector3(0, 0, -40);
-      const targetLook = new THREE.Vector3(0, -9.0, -60.0);
-      targetLookAt.lerpVectors(startLook, targetLook, t);
-
-      // Blend fog to city volumetric indigo
-      currentFogColor.lerpColors(tunnelColor, cityColor, t);
-      currentFogDensity = THREE.MathUtils.lerp(0.006, 0.012, t); // Volumetric density
-    }
+    // Blend fog color and density as we approach the portal
+    currentFogColor.lerpColors(spaceColor, portalColor, t);
+    currentFogDensity = THREE.MathUtils.lerp(0.0018, 0.005, t);
 
     // 2. Apply Camera Position Parallax (Cinematic mouse drift)
-    // Reduce parallax slightly during warp shake to avoid vector conflicts
-    const parallaxFactor = scrollProgress >= 0.2 && scrollProgress < 0.6 ? 0.3 : 1.0;
-    const targetCamX = mouse.x * 1.5 * parallaxFactor;
-    const targetCamY = -mouse.y * 1.5 * parallaxFactor;
+    const targetCamX = mouse.x * 1.5;
+    const targetCamY = -mouse.y * 1.5;
 
     camera.position.x += (targetCamPos.x + targetCamX - camera.position.x) * 0.04;
     camera.position.y += (targetCamPos.y + targetCamY - camera.position.y) * 0.04;
@@ -114,15 +73,12 @@ const SceneContent = ({ scrollProgress = 0 }) => {
       camera.position.z += (Math.random() - 0.5) * shakeIntensity * 0.5;
     }
 
-    // 4. Orient camera to look at interpolated target path
-    const currentLookAt = new THREE.Vector3(0, 0, -100);
-    // Smoothly lerp look-at vectors
-    currentLookAt.copy(targetLookAt);
+    // 4. Orient camera to look at portal
+    camera.lookAt(targetLookAt);
     
     // Add minor tilt rotation based on mouse parallax coordinates
-    camera.lookAt(currentLookAt);
-    camera.rotation.y += -mouse.x * 0.08 * parallaxFactor;
-    camera.rotation.x += mouse.y * 0.08 * parallaxFactor;
+    camera.rotation.y += -mouse.x * 0.08;
+    camera.rotation.x += mouse.y * 0.08;
 
     // 5. Update volumetric fog settings dynamically
     if (scene.fog) {
@@ -159,11 +115,8 @@ const SceneContent = ({ scrollProgress = 0 }) => {
         <Spaceship scrollProgress={scrollProgress} />
       </group>
 
-      {/* 3D Hyperspace Tunnel Overlay */}
-      <HyperspaceTunnel scrollProgress={scrollProgress} />
-
-      {/* 3D Floating AI City metropolis */}
-      <AICity scrollProgress={scrollProgress} />
+      {/* 3D Glowing Portal (positioned at [0, 0, -6.0]) */}
+      <Portal scrollProgress={scrollProgress} />
 
       {/* Background starfield and gaseous nebula layers */}
       <Starfield scrollProgress={scrollProgress} />
