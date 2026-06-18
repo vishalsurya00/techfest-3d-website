@@ -32,7 +32,7 @@ body {
   color: var(--text-primary);
   font-family: var(--font-body);
   overflow-x: hidden;
-  min-height: 100vh;
+  min-height: 200vh; /* 200vh to support scroll animations */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   cursor: none; /* Hide default cursor to use glowing trail */
@@ -161,3 +161,34 @@ body {
 a, button {
   cursor: none;
 }
+
+/* 3D WebGL Canvas placement */
+.webgl-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: auto;
+}
+
+/* Let clicks pass through default layout wrapper but enable them on child components */
+.fade-in-load {
+  position: relative;
+  width: 100%;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.navbar-container,
+.hero-content,
+.hud-details-left,
+.hud-details-right,
+.hero-footer,
+.enter-btn,
+.nav-link,
+.nav-console-btn {
+  pointer-events: auto;
+}
+
