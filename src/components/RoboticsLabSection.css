@@ -1,0 +1,110 @@
+/* =====================================================
+   ROBOTICS RESEARCH LAB SECTION — Futuristic third viewport section
+   ===================================================== */
+
+.robotics-lab-section {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+  padding: 0 24px;
+  gap: 52px;
+  pointer-events: none; /* Let clicks pass to 3D canvas */
+}
+
+/* ---- Section Heading ---- */
+.robotics-lab-heading {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  will-change: transform, opacity;
+  pointer-events: auto;
+}
+
+.robotics-lab-tagline {
+  font-family: var(--font-cyber);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 5px;
+  color: #00ffa0;
+  text-shadow: 0 0 10px rgba(0, 255, 160, 0.45);
+  text-transform: uppercase;
+  animation: pulse-green 2s infinite ease-in-out;
+}
+
+@keyframes pulse-green {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.robotics-lab-title {
+  font-family: var(--font-cyber);
+  font-size: clamp(38px, 8.5vw, 90px);
+  font-weight: 900;
+  letter-spacing: 16px;
+  color: #ffffff;
+  text-transform: uppercase;
+  line-height: 1;
+  padding-left: 16px;
+  text-shadow: 
+    0 0 15px rgba(0, 255, 160, 0.5),
+    0 0 30px rgba(0, 128, 255, 0.3);
+}
+
+.robotics-lab-subtitle {
+  font-family: var(--font-cyber);
+  font-size: clamp(11px, 2vw, 15px);
+  font-weight: 400;
+  letter-spacing: 6px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-style: italic;
+}
+
+/* ---- HUD Frame for Robotics Lab Section ---- */
+.robotics-lab-hud-frame {
+  position: absolute;
+  top: 40px;
+  bottom: 40px;
+  left: 40px;
+  right: 40px;
+  border: 1px solid rgba(0, 255, 160, 0.05);
+  pointer-events: none;
+}
+
+/* Helper to make sure HUD frame renders properly */
+.robotics-lab-hud-frame .hud-corner {
+  border-color: rgba(0, 255, 160, 0.22);
+}
+
+/* Interaction instruction overlay */
+.robotics-lab-instruction {
+  position: absolute;
+  bottom: 60px;
+  font-family: var(--font-cyber);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  color: #00ffa0;
+  text-transform: uppercase;
+  text-align: center;
+  animation: pulse-green 2s infinite ease-in-out;
+  pointer-events: auto;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 600px) {
+  .robotics-lab-title {
+    letter-spacing: 8px;
+  }
+
+  .robotics-lab-subtitle {
+    letter-spacing: 3px;
+  }
+}

@@ -33,7 +33,7 @@ body {
   font-family: var(--font-body);
   overflow-y: auto; /* Enable vertical scroll */
   overflow-x: hidden;
-  min-height: 300vh; /* 300vh: Hero (100vh) + Portal transition + AI City (100vh) */
+  min-height: 400vh; /* 400vh: Hero (100vh) + Portal transition + AI City (100vh) + Robotics Lab (100vh) */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   cursor: none; /* Hide default cursor to use glowing trail */

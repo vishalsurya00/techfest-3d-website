@@ -8,9 +8,11 @@ import AICore from './AICore';
 
 
 const AICity = ({ scrollProgress = 0 }) => {
-  // 1. Calculate opacity fade-in based on scroll progress (city appears during phase 2)
+  // 1. Calculate opacity fade-in and fade-out based on scroll progress
   const cityOpacity = useMemo(() => {
-    return THREE.MathUtils.smoothstep(scrollProgress, 0.5, 0.7);
+    const fadeIn = THREE.MathUtils.smoothstep(scrollProgress, 0.33, 0.45);
+    const fadeOut = 1.0 - THREE.MathUtils.smoothstep(scrollProgress, 0.66, 0.82);
+    return fadeIn * fadeOut;
   }, [scrollProgress]);
 
   // 2. Generate building grid parameters (runs unconditionally before any returns)

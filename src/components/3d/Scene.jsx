@@ -7,6 +7,7 @@ import Earth from './Earth';
 import Spaceship from './Spaceship';
 import Portal from './Portal';
 import AICity from './AICity';
+import RoboticsLab from './RoboticsLab';
 
 // Inner component to access R3F hooks (useFrame, useThree)
 const SceneContent = ({ scrollProgress = 0 }) => {
@@ -14,8 +15,9 @@ const SceneContent = ({ scrollProgress = 0 }) => {
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
   // Derive per-section progress for sub-components
-  const heroProgress = Math.min(1, Math.max(0, scrollProgress * 2));
-  const cityProgress = Math.min(1, Math.max(0, (scrollProgress - 0.5) * 2));
+  const heroProgress = Math.min(1, Math.max(0, scrollProgress * 3.0));
+  const cityProgress = Math.min(1, Math.max(0, (scrollProgress - 0.33) * 3.0));
+  const labProgress = Math.min(1, Math.max(0, (scrollProgress - 0.66) * 3.0));
 
   // Handle mouse movement for parallax
   useEffect(() => {
@@ -33,7 +35,7 @@ const SceneContent = ({ scrollProgress = 0 }) => {
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
 
-    // 1. Camera Positions & Targets — two-phase scroll timeline
+    // 1. Camera Positions & Targets — three-phase scroll timeline
     let targetCamPos = new THREE.Vector3();
     let targetLookAt = new THREE.Vector3();
     let shakeIntensity = 0;
@@ -42,48 +44,60 @@ const SceneContent = ({ scrollProgress = 0 }) => {
     const spaceColor = new THREE.Color('#05020a');
     const portalColor = new THREE.Color('#09041a');
     const cityFogColor = new THREE.Color('#0a0520');
+    const labFogColor = new THREE.Color('#080b18');
 
     let currentFogColor = new THREE.Color();
     let currentFogDensity = 0.0018;
 
-    if (scrollProgress <= 0.5) {
-      // ---- PHASE 1: Hero → Portal (scrollProgress 0.0 to 0.5) ----
-      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.0, 0.5);
+    if (scrollProgress <= 0.33) {
+      // ---- PHASE 1: Hero → Portal (scrollProgress 0.0 to 0.33) ----
+      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.0, 0.33);
 
-      // Camera moves forward from z=5.8 to z=1.2 (in front of portal at z=-6.0)
       const z = THREE.MathUtils.lerp(5.8, 1.2, t);
       targetCamPos.set(0, 0, z);
       targetLookAt.set(0, 0, -6.0);
 
-      // Screen shake: bell-curve peaking during warp
-      const shakeP = THREE.MathUtils.smoothstep(scrollProgress, 0.1, 0.42);
+      const shakeP = THREE.MathUtils.smoothstep(scrollProgress, 0.08, 0.28);
       shakeIntensity = Math.sin(shakeP * Math.PI) * 0.022;
 
-      // Fog: space → portal atmosphere
       currentFogColor.lerpColors(spaceColor, portalColor, t);
       currentFogDensity = THREE.MathUtils.lerp(0.0018, 0.005, t);
 
-    } else {
-      // ---- PHASE 2: Portal → AI City (scrollProgress 0.5 to 1.0) ----
-      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.5, 1.0);
+    } else if (scrollProgress > 0.33 && scrollProgress <= 0.66) {
+      // ---- PHASE 2: Portal → AI City (scrollProgress 0.33 to 0.66) ----
+      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.33, 0.66);
 
-      // Camera flies through portal and rises to overlook the city
       const z = THREE.MathUtils.lerp(1.2, -38, t);
       const y = THREE.MathUtils.lerp(0, 8, t);
       targetCamPos.set(0, y, z);
 
-      // Look target smoothly shifts from portal center to city center
       const lookY = THREE.MathUtils.lerp(0, -3, t);
       const lookZ = THREE.MathUtils.lerp(-6.0, -60, t);
       targetLookAt.set(0, lookY, lookZ);
 
-      // Mild shake at the beginning of phase 2 (flying through portal)
-      const shakeP2 = THREE.MathUtils.smoothstep(scrollProgress, 0.5, 0.62);
+      const shakeP2 = THREE.MathUtils.smoothstep(scrollProgress, 0.33, 0.43);
       shakeIntensity = Math.sin(shakeP2 * Math.PI) * 0.015;
 
-      // Fog: portal → city atmosphere
       currentFogColor.lerpColors(portalColor, cityFogColor, t);
       currentFogDensity = THREE.MathUtils.lerp(0.005, 0.008, t);
+
+    } else {
+      // ---- PHASE 3: AI City → Robotics Lab (scrollProgress 0.66 to 1.0) ----
+      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.66, 1.0);
+
+      const z = THREE.MathUtils.lerp(-38, -112.5, t);
+      const y = THREE.MathUtils.lerp(8, -1.5, t);
+      targetCamPos.set(0, y, z);
+
+      const lookY = THREE.MathUtils.lerp(-3, -1.8, t);
+      const lookZ = THREE.MathUtils.lerp(-60, -120, t);
+      targetLookAt.set(0, lookY, lookZ);
+
+      const shakeP3 = THREE.MathUtils.smoothstep(scrollProgress, 0.66, 0.78);
+      shakeIntensity = Math.sin(shakeP3 * Math.PI) * 0.01;
+
+      currentFogColor.lerpColors(cityFogColor, labFogColor, t);
+      currentFogDensity = THREE.MathUtils.lerp(0.008, 0.011, t);
     }
 
     // 2. Apply Camera Position with Parallax (Cinematic mouse drift)
@@ -148,22 +162,25 @@ const SceneContent = ({ scrollProgress = 0 }) => {
       {/* 3D AI City — uses raw scrollProgress for opacity timing */}
       <AICity scrollProgress={scrollProgress} />
 
+      {/* 3D Robotics Lab — uses raw scrollProgress for transition/fading */}
+      <RoboticsLab scrollProgress={scrollProgress} />
+
       {/* Background starfield and nebula — uses raw scrollProgress, computes heroPhase internally */}
       <Starfield scrollProgress={scrollProgress} />
       <Nebula scrollProgress={scrollProgress} />
 
-      {/* City overhead ambient light — fades in during city phase */}
+      {/* City overhead ambient light — fades in during city phase, fades out in lab phase */}
       <pointLight
         position={[0, 15, -60]}
         color="#00f0ff"
-        intensity={cityProgress * 8}
+        intensity={cityProgress * (1.0 - labProgress) * 8}
         distance={80}
         decay={2}
       />
       <pointLight
         position={[0, -5, -60]}
         color="#bd00ff"
-        intensity={cityProgress * 4}
+        intensity={cityProgress * (1.0 - labProgress) * 4}
         distance={60}
         decay={2}
       />

@@ -3,6 +3,7 @@ import Scene from './components/3d/Scene';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import AICitySection from './components/AICitySection';
+import RoboticsLabSection from './components/RoboticsLabSection';
 import CustomCursor from './components/CustomCursor';
 
 function App() {
@@ -23,13 +24,14 @@ function App() {
   }, []);
 
   // Derive per-section progress (0-1 within each section's scroll range)
-  // scrollProgress 0.0→0.5 = Hero section | scrollProgress 0.5→1.0 = AI City section
-  const heroProgress = Math.min(1, Math.max(0, scrollProgress * 2));
-  const cityProgress = Math.min(1, Math.max(0, (scrollProgress - 0.5) * 2));
+  // scrollProgress: 0.0→0.33 = Hero | 0.33→0.66 = AI City | 0.66→1.0 = Robotics Lab
+  const heroProgress = Math.min(1, Math.max(0, scrollProgress * 3.0));
+  const cityProgress = Math.min(1, Math.max(0, (scrollProgress - 0.33) * 3.0));
+  const labProgress = Math.min(1, Math.max(0, (scrollProgress - 0.66) * 3.0));
 
   // Portal Title: appears near end of hero phase, fades as city phase begins
-  const portalFadeIn = Math.max(0, Math.min(1, (scrollProgress - 0.35) * 10));
-  const portalFadeOut = Math.max(0, Math.min(1, 1 - (scrollProgress - 0.5) * 10));
+  const portalFadeIn = Math.max(0, Math.min(1, (scrollProgress - 0.23) * 10));
+  const portalFadeOut = Math.max(0, Math.min(1, 1 - (scrollProgress - 0.33) * 10));
   const portalTitleOpacity = portalFadeIn * portalFadeOut;
   const portalTitleTranslateY = 20 - portalFadeIn * 20;
 
@@ -50,6 +52,9 @@ function App() {
 
         {/* AI City Section (scroll-animated 3D city overlay) */}
         <AICitySection scrollProgress={cityProgress} />
+
+        {/* Robotics Research Lab Section (scroll-animated HTML overlay) */}
+        <RoboticsLabSection scrollProgress={labProgress} />
 
         {/* Portal Title Overlay (fixed, transitions between sections) */}
         <div 
