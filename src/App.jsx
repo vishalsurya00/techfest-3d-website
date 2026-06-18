@@ -12,7 +12,8 @@ function App() {
       const docHeight = document.documentElement.scrollHeight;
       const windowHeight = window.innerHeight;
       const maxScroll = docHeight - windowHeight;
-      const progress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+      const rawProgress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+      const progress = Math.max(0, Math.min(1, rawProgress));
       setScrollProgress(progress);
     };
 

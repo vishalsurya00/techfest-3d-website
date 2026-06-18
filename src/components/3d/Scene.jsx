@@ -74,11 +74,12 @@ const SceneContent = ({ scrollProgress = 0 }) => {
     }
 
     // 4. Orient camera to look at portal
-    camera.lookAt(targetLookAt);
-    
-    // Add minor tilt rotation based on mouse parallax coordinates
-    camera.rotation.y += -mouse.x * 0.08;
-    camera.rotation.x += mouse.y * 0.08;
+    // Add mouse parallax offset to the lookAt target to tilt the camera dynamically
+    // rather than modifying camera.rotation directly (which can desynchronize quaternion/matrix and cause NaNs)
+    const tiltedLookAt = new THREE.Vector3().copy(targetLookAt);
+    tiltedLookAt.x += mouse.x * 1.2;
+    tiltedLookAt.y -= mouse.y * 1.2;
+    camera.lookAt(tiltedLookAt);
 
     // 5. Update volumetric fog settings dynamically
     if (scene.fog) {

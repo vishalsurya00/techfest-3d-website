@@ -77,6 +77,7 @@ const Spaceship = ({ scrollProgress = 0 }) => {
     // centered relative to the scene at [0, -0.85, -2.5] in camera space
     // Let's translate it into world space relative to the camera
     const cam = state.camera;
+    cam.updateMatrixWorld();
     const posWarp = new THREE.Vector3(0, -0.85, -3.2).applyMatrix4(cam.matrixWorld);
 
     // Define Position 3: Portal Hover / Orbit
