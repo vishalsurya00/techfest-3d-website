@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg-dark: #05020a;
+  --bg-dark-accent: #0c0618;
+  
+  --primary-glow: #00f0ff; /* Electric Blue */
+  --secondary-glow: #bd00ff; /* Neon Purple */
+  --accent-glow: #ff007a; /* Neon Pink/Magenta */
+  
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  
+  --font-cyber: 'Orbitron', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: all 0.2s ease;
+  
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  cursor: none; /* Hide default cursor to use glowing trail */
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, var(--secondary-glow), var(--primary-glow));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-glow);
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+
+/* Custom Cursor & Trail Container */
+.custom-cursor-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Global Grid Backdrop Scanline Overlay */
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* Cinematic Page Vignette */
+.vignette {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle, transparent 40%, rgba(5, 2, 10, 0.8) 100%);
+  z-index: 11;
+  pointer-events: none;
+}
+
+/* Global Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.5),
+                 0 0 20px rgba(0, 240, 255, 0.3),
+                 0 0 30px rgba(189, 0, 255, 0.2);
+  }
+  50% {
+    text-shadow: 0 0 15px rgba(0, 240, 255, 0.8),
+                 0 0 30px rgba(0, 240, 255, 0.5),
+                 0 0 45px rgba(189, 0, 255, 0.4),
+                 0 0 60px rgba(189, 0, 255, 0.2);
+  }
+}
+
+@keyframes grid-move {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(40px); }
+}
+
+/* Root Mount Fade-In */
+.fade-in-load {
+  opacity: 0;
+  animation: page-fade-in 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(1.02);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Sci-fi utility borders */
+.hud-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  pointer-events: none;
+}
+
+.hud-corner-tl { top: 0; left: 0; border-right: none; border-bottom: none; }
+.hud-corner-tr { top: 0; right: 0; border-left: none; border-bottom: none; }
+.hud-corner-bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+.hud-corner-br { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+/* Interactive links cursor fallback for accessibility */
+a, button {
+  cursor: none;
+}
