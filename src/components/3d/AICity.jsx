@@ -4,6 +4,8 @@ import { useFrame } from '@react-three/fiber';
 import Drone from './Drone';
 import Hologram from './Hologram';
 import EnergyRoad from './EnergyRoad';
+import AICore from './AICore';
+
 
 const AICity = ({ scrollProgress = 0 }) => {
   // 1. Calculate opacity fade-in based on scroll progress (city appears during phase 2)
@@ -205,7 +207,9 @@ const AICity = ({ scrollProgress = 0 }) => {
       {/* 4. Skyscraper Holograms */}
       <Hologram position={[-5.8, 1.2, -66]} scale={1.2} type="knot" color="#ff007a" />
       <Hologram position={[5.8, -1.8, -54]} scale={0.9} type="sphere" color="#00f0ff" />
-      <Hologram position={[0, -8.3, -60]} scale={1.8} type="knot" color="#bd00ff" />
+      
+      {/* 5. Center Interactive AI Core (Glowing sphere, orbiting nodes, info panels) */}
+      <AICore position={[0, -4.5, -60]} cityOpacity={cityOpacity} />
 
       {/* 5. Energy Roads Grid */}
       <EnergyRoad start={[-5.8, -1.0, -66]} end={[5.8, -1.0, -66]} color="#ff007a" />
