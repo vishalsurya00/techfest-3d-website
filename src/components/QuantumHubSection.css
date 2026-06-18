@@ -1,0 +1,170 @@
+/* =====================================================
+   QUANTUM INNOVATION HUB SECTION — Fourth viewport section
+   ===================================================== */
+
+.quantum-hub-section {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+  padding: 0 24px;
+  pointer-events: none; /* Let clicks pass to 3D canvas */
+}
+
+/* ---- Section Heading ---- */
+.quantum-hub-heading {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  will-change: transform, opacity;
+  pointer-events: auto;
+}
+
+.quantum-hub-tagline {
+  font-family: var(--font-cyber);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 5px;
+  color: var(--secondary-glow);
+  text-shadow: 0 0 10px rgba(189, 0, 255, 0.45);
+  text-transform: uppercase;
+  animation: pulse-purple 2s infinite ease-in-out;
+}
+
+@keyframes pulse-purple {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.quantum-hub-title {
+  font-family: var(--font-cyber);
+  font-size: clamp(32px, 7vw, 78px);
+  font-weight: 900;
+  letter-spacing: 12px;
+  color: #ffffff;
+  text-transform: uppercase;
+  line-height: 1.1;
+  padding-left: 12px;
+  text-shadow: 
+    0 0 15px rgba(189, 0, 255, 0.5),
+    0 0 30px rgba(0, 240, 255, 0.3);
+}
+
+.quantum-hub-subtitle {
+  font-family: var(--font-cyber);
+  font-size: clamp(10px, 1.8vw, 14px);
+  font-weight: 400;
+  letter-spacing: 5px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+/* ---- HUD Frame for Quantum Hub ---- */
+.quantum-hub-hud-frame {
+  position: absolute;
+  top: 40px;
+  bottom: 40px;
+  left: 40px;
+  right: 40px;
+  border: 1px solid rgba(189, 0, 255, 0.05);
+  pointer-events: none;
+}
+
+.quantum-hub-hud-frame .hud-corner {
+  border-color: rgba(189, 0, 255, 0.25);
+}
+
+/* Interaction instruction overlay */
+.quantum-hub-instruction {
+  position: absolute;
+  bottom: 60px;
+  font-family: var(--font-cyber);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  color: var(--secondary-glow);
+  text-transform: uppercase;
+  text-align: center;
+  animation: pulse-purple 2s infinite ease-in-out;
+  pointer-events: auto;
+}
+
+/* Ambient Audio Synth Button */
+.quantum-audio-toggle {
+  position: absolute;
+  top: 60px;
+  right: 60px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(8, 4, 18, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(189, 0, 255, 0.3);
+  color: var(--secondary-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: none;
+  pointer-events: auto;
+  transition: var(--transition-smooth);
+  box-shadow: 
+    0 0 10px rgba(189, 0, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.quantum-audio-toggle:hover {
+  color: #ffffff;
+  border-color: var(--primary-glow);
+  box-shadow: 
+    0 0 15px rgba(0, 240, 255, 0.4),
+    0 0 25px rgba(189, 0, 255, 0.2);
+  transform: scale(1.08);
+}
+
+.quantum-audio-toggle.active {
+  color: var(--primary-glow);
+  border-color: var(--primary-glow);
+  box-shadow: 
+    0 0 15px rgba(0, 240, 255, 0.4),
+    0 0 30px rgba(0, 240, 255, 0.2);
+  animation: audio-pulse 1.8s infinite ease-in-out;
+}
+
+@keyframes audio-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.95;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+
+.audio-icon-svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 600px) {
+  .quantum-hub-title {
+    letter-spacing: 6px;
+  }
+
+  .quantum-hub-subtitle {
+    letter-spacing: 3px;
+  }
+  
+  .quantum-audio-toggle {
+    top: 50px;
+    right: 50px;
+  }
+}

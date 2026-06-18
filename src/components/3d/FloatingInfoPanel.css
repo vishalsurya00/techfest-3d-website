@@ -1,0 +1,141 @@
+/* =====================================================
+   QUANTUM INFO PANEL — Sci-fi details overlay
+   ===================================================== */
+
+.quantum-info-panel {
+  position: relative;
+  width: 290px;
+  background: rgba(8, 4, 18, 0.82);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(189, 0, 255, 0.3);
+  border-radius: 12px;
+  padding: 22px 18px;
+  color: #ffffff;
+  pointer-events: auto;
+  box-shadow: 
+    0 15px 45px rgba(0, 0, 0, 0.6),
+    0 0 25px rgba(189, 0, 255, 0.2),
+    0 0 50px rgba(0, 240, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transform-origin: center;
+  animation: q-panel-appear 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  user-select: none;
+}
+
+@keyframes q-panel-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.88) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.quantum-info-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  width: 100%;
+}
+
+.quantum-info-panel__title {
+  font-family: var(--font-cyber);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(189, 0, 255, 0.5);
+}
+
+.quantum-info-panel__close-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 20px;
+  line-height: 1;
+  cursor: none;
+  padding: 4px;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quantum-info-panel__close-btn:hover {
+  color: var(--primary-glow);
+  transform: scale(1.15);
+}
+
+.quantum-info-panel__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.quantum-info-panel__icon {
+  width: 40px;
+  height: 40px;
+  color: var(--secondary-glow);
+  filter: drop-shadow(0 0 8px rgba(189, 0, 255, 0.5));
+  animation: q-icon-float 4s ease-in-out infinite;
+}
+
+.quantum-info-panel__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes q-icon-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.quantum-info-panel__desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 400;
+}
+
+/* HUD Accents */
+.qp-hud-line {
+  position: absolute;
+  background: var(--secondary-glow);
+  opacity: 0.6;
+}
+
+.qp-hud-top-decor {
+  top: -1px;
+  left: 20px;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--secondary-glow), transparent);
+}
+
+.qp-hud-corner {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1px solid rgba(189, 0, 255, 0.3);
+  pointer-events: none;
+}
+
+.qp-hud-tl { top: 6px; left: 6px; border-right: none; border-bottom: none; }
+.qp-hud-tr { top: 6px; right: 6px; border-left: none; border-bottom: none; }
+.qp-hud-bl { bottom: 6px; left: 6px; border-right: none; border-top: none; }
+.qp-hud-br { bottom: 6px; right: 6px; border-left: none; border-top: none; }
+
+@media (max-width: 400px) {
+  .quantum-info-panel {
+    width: 250px;
+    padding: 16px 12px;
+  }
+}

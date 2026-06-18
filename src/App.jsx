@@ -4,10 +4,12 @@ import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import AICitySection from './components/AICitySection';
 import RoboticsLabSection from './components/RoboticsLabSection';
+import QuantumHubSection from './components/QuantumHubSection';
 import CustomCursor from './components/CustomCursor';
 
 function App() {
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [activeIslandId, setActiveIslandId] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,14 +26,15 @@ function App() {
   }, []);
 
   // Derive per-section progress (0-1 within each section's scroll range)
-  // scrollProgress: 0.0→0.33 = Hero | 0.33→0.66 = AI City | 0.66→1.0 = Robotics Lab
-  const heroProgress = Math.min(1, Math.max(0, scrollProgress * 3.0));
-  const cityProgress = Math.min(1, Math.max(0, (scrollProgress - 0.33) * 3.0));
-  const labProgress = Math.min(1, Math.max(0, (scrollProgress - 0.66) * 3.0));
+  // scrollProgress: 0.0→0.25 = Hero | 0.25→0.50 = AI City | 0.50→0.75 = Robotics Lab | 0.75→1.0 = Quantum Hub
+  const heroProgress = Math.min(1, Math.max(0, scrollProgress * 4.0));
+  const cityProgress = Math.min(1, Math.max(0, (scrollProgress - 0.25) * 4.0));
+  const labProgress = Math.min(1, Math.max(0, (scrollProgress - 0.50) * 4.0));
+  const hubProgress = Math.min(1, Math.max(0, (scrollProgress - 0.75) * 4.0));
 
   // Portal Title: appears near end of hero phase, fades as city phase begins
-  const portalFadeIn = Math.max(0, Math.min(1, (scrollProgress - 0.23) * 10));
-  const portalFadeOut = Math.max(0, Math.min(1, 1 - (scrollProgress - 0.33) * 10));
+  const portalFadeIn = Math.max(0, Math.min(1, (scrollProgress - 0.17) * 12));
+  const portalFadeOut = Math.max(0, Math.min(1, 1 - (scrollProgress - 0.25) * 12));
   const portalTitleOpacity = portalFadeIn * portalFadeOut;
   const portalTitleTranslateY = 20 - portalFadeIn * 20;
 
@@ -41,7 +44,7 @@ function App() {
       <CustomCursor />
 
       {/* 3D Interactive WebGL Universe Background */}
-      <Scene scrollProgress={scrollProgress} />
+      <Scene scrollProgress={scrollProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} />
 
       <div className="fade-in-load">
         {/* Floating Glassmorphism Navbar */}
@@ -55,6 +58,9 @@ function App() {
 
         {/* Robotics Research Lab Section (scroll-animated HTML overlay) */}
         <RoboticsLabSection scrollProgress={labProgress} />
+
+        {/* Quantum Innovation Hub Section (scroll-animated HTML overlay) */}
+        <QuantumHubSection scrollProgress={hubProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} />
 
         {/* Portal Title Overlay (fixed, transitions between sections) */}
         <div 
