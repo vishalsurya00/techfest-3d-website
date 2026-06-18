@@ -128,19 +128,15 @@ body {
 /* Root Mount Fade-In */
 .fade-in-load {
   opacity: 0;
-  animation: page-fade-in 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: page-fade-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes page-fade-in {
   from {
     opacity: 0;
-    transform: scale(1.02);
-    filter: blur(8px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
-    filter: blur(0);
   }
 }
 

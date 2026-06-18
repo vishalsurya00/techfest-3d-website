@@ -26,39 +26,41 @@ function App() {
   const portalTitleTranslateY = 20 - Math.min(20, (scrollProgress - 0.75) * 80);
 
   return (
-    <div className="fade-in-load">
+    <>
       {/* Custom Glowing Cursor with Particle Trail */}
       <CustomCursor />
 
       {/* 3D Interactive WebGL Universe Background */}
       <Scene scrollProgress={scrollProgress} />
 
-      {/* Floating Glassmorphism Navbar */}
-      <Navbar />
+      <div className="fade-in-load">
+        {/* Floating Glassmorphism Navbar */}
+        <Navbar />
 
-      {/* HUD Hero Section Layer */}
-      <HeroSection scrollProgress={scrollProgress} />
+        {/* HUD Hero Section Layer */}
+        <HeroSection scrollProgress={scrollProgress} />
 
-      {/* Portal Title Overlay */}
-      <div 
-        className="portal-title-overlay"
-        style={{
-          opacity: portalTitleOpacity,
-          transform: `translate(-50%, calc(-50% + ${portalTitleTranslateY}px))`,
-          pointerEvents: portalTitleOpacity > 0.1 ? 'auto' : 'none'
-        }}
-      >
-        <h1 className="portal-title">ENTER THE AI DIMENSION</h1>
-        <div className="portal-scroll-indicator">
-          Continue Scrolling
-          <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'center' }}>
-            <svg className="down-arrow-svg" viewBox="0 0 24 24" fill="none" style={{ width: '18px', height: '18px' }}>
-              <path d="M7 13l5 5 5-5M7 6l5 5 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+        {/* Portal Title Overlay */}
+        <div 
+          className="portal-title-overlay"
+          style={{
+            opacity: portalTitleOpacity,
+            transform: `translate(-50%, calc(-50% + ${portalTitleTranslateY}px))`,
+            pointerEvents: portalTitleOpacity > 0.1 ? 'auto' : 'none'
+          }}
+        >
+          <h1 className="portal-title">ENTER THE AI DIMENSION</h1>
+          <div className="portal-scroll-indicator">
+            Continue Scrolling
+            <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'center' }}>
+              <svg className="down-arrow-svg" viewBox="0 0 24 24" fill="none" style={{ width: '18px', height: '18px' }}>
+                <path d="M7 13l5 5 5-5M7 6l5 5 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
