@@ -32,7 +32,7 @@ body {
   color: var(--text-primary);
   font-family: var(--font-body);
   overflow-x: hidden;
-  min-height: 200vh; /* 200vh to support scroll animations */
+  min-height: 400vh; /* 400vh to support scroll animations */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   cursor: none; /* Hide default cursor to use glowing trail */
@@ -191,4 +191,43 @@ a, button {
 .nav-console-btn {
   pointer-events: auto;
 }
+
+/* AI City Landing HUD Title Overlay */
+.city-title-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 100;
+  pointer-events: none;
+  font-family: var(--font-cyber);
+  will-change: transform, opacity;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 90%;
+  max-width: 800px;
+}
+
+.city-title {
+  font-size: clamp(36px, 8vw, 84px);
+  font-weight: 900;
+  letter-spacing: 16px;
+  color: #ffffff;
+  text-transform: uppercase;
+  text-shadow: 0 0 15px rgba(0, 240, 255, 0.6),
+               0 0 30px rgba(189, 0, 255, 0.4);
+  animation: glow-pulse 4s infinite ease-in-out;
+}
+
+.city-subtitle {
+  font-size: clamp(11px, 2vw, 15px);
+  font-weight: 500;
+  letter-spacing: 6px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
 

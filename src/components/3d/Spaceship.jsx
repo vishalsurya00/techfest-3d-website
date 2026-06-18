@@ -52,65 +52,152 @@ const Spaceship = ({ scrollProgress = 0 }) => {
     const time = state.clock.getElapsedTime();
     const data = stateRef.current;
 
-    // 1. Calculate speed based on scroll
-    // Spaceship boosts briefly when user scrolls (bell-curve peak acceleration)
-    const scrollBoost = Math.max(0, Math.sin(scrollProgress * Math.PI)) * 2.8;
+    // Cap delta to prevent NaNs
+    const delta = Math.min(0.1, state.delta);
+
+    // 1. Speeds and angular updates
+    const scrollBoost = Math.max(0, Math.sin(scrollProgress * Math.PI)) * 3.2;
     const currentSpeed = baseSpeed + scrollBoost;
-    
-    // Accumulate orbit angle
-    data.theta += state.delta * currentSpeed;
+    data.theta += delta * currentSpeed;
 
-    // 2. Calculate orbit coordinates relative to Earth origin
-    // We add a tilt to the orbit plane (Y variance) so it feels multi-dimensional
-    const x = Math.cos(data.theta) * orbitRadius;
-    const z = Math.sin(data.theta) * orbitRadius;
-    const y = Math.sin(data.theta * 1.5) * 0.4 - 0.1; // Slightly angled
+    // 2. Define Position 1: Earth Orbit (Local relative to Earth origin)
+    // Earth is positioned at [-2.5, -0.2, 0] to [-7.0, -0.2, 8.0]
+    // Since the spaceship is in the same parent group, its local coordinates
+    // are relative to the parent group.
+    const orbitX = Math.cos(data.theta) * orbitRadius;
+    const orbitZ = Math.sin(data.theta) * orbitRadius;
+    const orbitY = Math.sin(data.theta * 1.5) * 0.4 - 0.1;
+    const posOrbit = new THREE.Vector3(orbitX, orbitY, orbitZ);
 
-    if (shipRef.current) {
-      shipRef.current.position.set(x, y, z);
+    // Define Position 2: Centered Warp (Relative to the camera view)
+    // At warp, camera is zoom-moving. The spaceship centers in the viewport
+    // centered relative to the scene at [0, -0.85, -2.5] in camera space
+    // Let's translate it into world space relative to the camera
+    const cam = state.camera;
+    const posWarp = new THREE.Vector3(0, -0.85, -2.6).applyMatrix4(cam.matrixWorld);
 
-      // 3. Orient spaceship along travel vector (tangent of orbit)
+    // Define Position 3: City Hover / Orbit
+    // City is centered at [0, -9.0, -60]. Spaceship orbits the center
+    const cityOrbitRadius = 3.5;
+    const cityX = Math.cos(data.theta * 0.8) * cityOrbitRadius;
+    const cityZ = -60 + Math.sin(data.theta * 0.8) * cityOrbitRadius;
+    const cityY = -7.5 + Math.sin(data.theta * 1.2) * 0.3; // hover above platform
+    const posCity = new THREE.Vector3(cityX, cityY, cityZ);
+
+    // 3. Blend positions based on scroll progress
+    let finalPos = new THREE.Vector3();
+    let targetLook = new THREE.Vector3();
+    let isWarping = false;
+
+    // Thruster scale factors
+    let thrusterScale = 1.0;
+
+    if (scrollProgress < 0.2) {
+      // Phase 1: Normal Earth Orbit
+      finalPos.copy(posOrbit);
+      
       const tangentX = -Math.sin(data.theta) * orbitRadius;
       const tangentZ = Math.cos(data.theta) * orbitRadius;
       const tangentY = Math.cos(data.theta * 1.5) * 0.4 * 1.5;
-
-      const targetPos = new THREE.Vector3(x + tangentX, y + tangentY, z + tangentZ);
-      shipRef.current.lookAt(targetPos);
-
-      // 4. Banking (Roll) tilt
-      // Tilt (roll) into the center of orbit (Earth is at 0, 0, 0)
-      // The roll angle is determined by speed and current orientation
-      shipRef.current.rotateOnAxis(new THREE.Vector3(0, 0, 1), 0.5 + Math.sin(time * 2) * 0.05);
+      targetLook.set(orbitX + tangentX, orbitY + tangentY, orbitZ + tangentZ);
+    } else if (scrollProgress >= 0.2 && scrollProgress < 0.38) {
+      // Transition from Orbit to Warp
+      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.2, 0.38);
+      finalPos.lerpVectors(posOrbit, posWarp, t);
       
-      // Pitch/Wobble adjustment for game-like turbulence
-      shipRef.current.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.sin(time * 5) * 0.05);
+      // Look direction blends to forward (facing away from camera)
+      const forwardDir = new THREE.Vector3(0, 0, -5).applyQuaternion(cam.quaternion).add(finalPos);
+      const tangentX = -Math.sin(data.theta) * orbitRadius;
+      const tangentZ = Math.cos(data.theta) * orbitRadius;
+      const tangentY = Math.cos(data.theta * 1.5) * 0.4 * 1.5;
+      const orbitLook = new THREE.Vector3(orbitX + tangentX, orbitY + tangentY, orbitZ + tangentZ);
+      
+      targetLook.lerpVectors(orbitLook, forwardDir, t);
+      thrusterScale = 1.0 + t * 3.5; // Fire booster
+      isWarping = true;
+    } else if (scrollProgress >= 0.38 && scrollProgress < 0.58) {
+      // Phase 2: Full Warp (centered in front of camera)
+      finalPos.copy(posWarp);
+      targetLook.set(0, 0, -5).applyQuaternion(cam.quaternion).add(finalPos);
+      thrusterScale = 4.5 + Math.sin(time * 25.0) * 0.4; // Pulsing warp drive
+      isWarping = true;
+    } else if (scrollProgress >= 0.58 && scrollProgress < 0.75) {
+      // Transition from Warp to City
+      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.58, 0.75);
+      finalPos.lerpVectors(posWarp, posCity, t);
+      
+      const cityTangentX = -Math.sin(data.theta * 0.8) * cityOrbitRadius;
+      const cityTangentZ = Math.cos(data.theta * 0.8) * cityOrbitRadius;
+      const cityTangentY = Math.cos(data.theta * 1.2) * 0.3 * 1.2;
+      const cityLook = new THREE.Vector3(cityX + cityTangentX, cityY + cityTangentY, cityZ + cityTangentZ);
+      const forwardDir = new THREE.Vector3(0, 0, -5).applyQuaternion(cam.quaternion).add(finalPos);
 
-      // 5. Update engine trail particle buffer
+      targetLook.lerpVectors(forwardDir, cityLook, t);
+      thrusterScale = 4.5 - t * 3.5; // Decelerate booster
+    } else {
+      // Phase 3: City Arrival Hover
+      finalPos.copy(posCity);
+      
+      const cityTangentX = -Math.sin(data.theta * 0.8) * cityOrbitRadius;
+      const cityTangentZ = Math.cos(data.theta * 0.8) * cityOrbitRadius;
+      const cityTangentY = Math.cos(data.theta * 1.2) * 0.3 * 1.2;
+      targetLook.set(cityX + cityTangentX, cityY + cityTangentY, cityZ + cityTangentZ);
+      thrusterScale = 1.0 + Math.sin(time * 5.0) * 0.1;
+    }
+
+    // Apply computed position
+    if (shipRef.current) {
+      shipRef.current.position.copy(finalPos);
+      shipRef.current.lookAt(targetLook);
+
+      // Add a slight tilt wobble or screen shake effect during warp
+      if (isWarping) {
+        // High-frequency vibration
+        const jitterX = (Math.random() - 0.5) * 0.015;
+        const jitterY = (Math.random() - 0.5) * 0.015;
+        shipRef.current.position.x += jitterX;
+        shipRef.current.position.y += jitterY;
+        
+        // Banking alignment straight
+        shipRef.current.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.sin(time * 35.0) * 0.05);
+      } else {
+        // Normal orbital banking tilt
+        shipRef.current.rotateOnAxis(new THREE.Vector3(0, 0, 1), 0.5 + Math.sin(time * 2.0) * 0.05);
+        shipRef.current.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.sin(time * 5.0) * 0.05);
+      }
+
+      // Scale engine thruster cone mesh
+      const thrusterMesh = shipRef.current.children[5]; // Flame mesh is index 5
+      if (thrusterMesh) {
+        thrusterMesh.scale.set(thrusterScale, thrusterScale, thrusterScale);
+      }
+
+      // Update engine trail particle buffer
       if (trailPointsRef.current) {
         const geo = trailPointsRef.current.geometry;
         const positions = geo.attributes.position.array;
 
-        // Shift all points back
+        // Shift points back
         for (let i = trailLength - 1; i > 0; i--) {
           positions[i * 3] = positions[(i - 1) * 3];
           positions[i * 3 + 1] = positions[(i - 1) * 3 + 1];
           positions[i * 3 + 2] = positions[(i - 1) * 3 + 2];
         }
 
-        // Force update the matrix so world position is accurate and non-NaN
+        // Get absolute world position of thruster
         shipRef.current.updateMatrix();
         shipRef.current.updateMatrixWorld();
-        
-        // Get absolute world position of thruster (back of the ship)
         const thrusterOffset = new THREE.Vector3(0, 0, -0.25);
         thrusterOffset.applyMatrix4(shipRef.current.matrixWorld);
-        
-        // Add current thruster position at head of trail
+
         positions[0] = thrusterOffset.x;
         positions[1] = thrusterOffset.y;
         positions[2] = thrusterOffset.z;
 
         geo.attributes.position.needsUpdate = true;
+        
+        // Update pointsMaterial size based on warp booster fire
+        trailPointsRef.current.material.size = 0.16 * (1.0 + (thrusterScale - 1.0) * 0.5);
       }
     }
   });

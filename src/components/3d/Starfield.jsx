@@ -65,9 +65,11 @@ const Starfield = ({ scrollProgress = 0 }) => {
         attribute float aPhase;
         varying float vAlpha;
         varying vec3 vColor;
+        varying float vWarpSpeed;
 
         void main() {
           vec3 pos = position;
+          vWarpSpeed = uWarpSpeed;
           
           // Calculate movement. Speed is base speed + warp multiplier
           float speedFactor = 1.0 + uWarpSpeed;
@@ -85,7 +87,7 @@ const Starfield = ({ scrollProgress = 0 }) => {
           
           // Point size: scale up during warp to create streak effect
           float baseSize = 1.6;
-          gl_PointSize = baseSize * (1.0 + uWarpSpeed * 0.05) * (300.0 / -mvPosition.z);
+          gl_PointSize = baseSize * (1.0 + uWarpSpeed * 0.4) * (300.0 / -mvPosition.z);
           
           // Alpha fadeout: fade in at distance, fade out very close to camera
           vAlpha = smoothstep(-1000.0, -800.0, pos.z) * smoothstep(-10.0, -150.0, pos.z) * twinkle;
@@ -104,10 +106,16 @@ const Starfield = ({ scrollProgress = 0 }) => {
       fragmentShader: `
         varying float vAlpha;
         varying vec3 vColor;
+        varying float vWarpSpeed;
 
         void main() {
-          // Circular point texture rendering
-          float dist = length(gl_PointCoord - vec2(0.5));
+          // Circular point texture rendering, stretched during warp speed
+          vec2 coord = gl_PointCoord - vec2(0.5);
+          
+          // Squeeze horizontally to stretch vertically (creating vertical light streaks)
+          coord.x *= (1.0 + vWarpSpeed * 1.5);
+          
+          float dist = length(coord);
           if (dist > 0.5) discard;
           
           // Soft radial falloff for glowing look
