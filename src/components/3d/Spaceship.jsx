@@ -13,7 +13,7 @@ const Spaceship = ({ scrollProgress = 0 }) => {
   }, []);
   
   // 1. Setup spaceship parameters
-  const orbitRadius = 2.6;
+  const orbitRadius = 1.56; // Reduced by 40% (2.6 * 0.6)
   const baseSpeed = 0.6;
   
   // 2. Engine trail configurations
@@ -61,12 +61,15 @@ const Spaceship = ({ scrollProgress = 0 }) => {
     data.theta += delta * currentSpeed;
 
     // 2. Define Position 1: Earth Orbit (Local relative to Earth origin)
-    // Earth is positioned at [-2.5, -0.2, 0] to [-7.0, -0.2, 8.0]
+    // Earth is positioned at [-3.8, -0.2, 0] to [-7.0, -0.2, 8.0]
     // Since the spaceship is in the same parent group, its local coordinates
     // are relative to the parent group.
-    const orbitX = Math.cos(data.theta) * orbitRadius;
-    const orbitZ = Math.sin(data.theta) * orbitRadius;
-    const orbitY = Math.sin(data.theta * 1.5) * 0.4 - 0.1;
+    const earthX = -3.8;
+    const earthY = -0.2;
+    const earthZ = 0;
+    const orbitX = earthX + Math.cos(data.theta) * orbitRadius;
+    const orbitZ = earthZ + Math.sin(data.theta) * orbitRadius;
+    const orbitY = earthY + Math.sin(data.theta * 1.5) * 0.4 - 0.1;
     const posOrbit = new THREE.Vector3(orbitX, orbitY, orbitZ);
 
     // Define Position 2: Centered Warp (Relative to the camera view)
@@ -211,8 +214,8 @@ const Spaceship = ({ scrollProgress = 0 }) => {
 
   return (
     <group>
-      {/* Spaceship Model Construction (Sleek sci-fi look) */}
-      <group ref={shipRef}>
+      {/* Spaceship Model Construction (Sleek sci-fi look) - Scaled down by 40% */}
+      <group ref={shipRef} scale={0.6}>
         {/* Cockpit */}
         <mesh position={[0, 0.03, 0.05]}>
           <sphereGeometry args={[0.04, 16, 16]} />

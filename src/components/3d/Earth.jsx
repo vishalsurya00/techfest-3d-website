@@ -210,7 +210,7 @@ const Earth = ({ scrollProgress = 0 }) => {
 
     // Scroll interpolation: Earth flies past the camera (moves behind and wide)
     if (earthGroupRef.current) {
-      const startX = -2.5;
+      const startX = -3.8;
       const targetX = -7.0;
       
       const startZ = 0.0;
@@ -223,14 +223,14 @@ const Earth = ({ scrollProgress = 0 }) => {
       earthGroupRef.current.position.x = currentX;
       earthGroupRef.current.position.z = currentZ;
 
-      // Scale Earth down slightly during zoom to enhance depth distortion
-      const currentScale = THREE.MathUtils.lerp(1.0, 0.9, scrollProgress);
+      // Scale Earth down by 40% (base scale 0.6)
+      const currentScale = THREE.MathUtils.lerp(0.6, 0.6 * 0.9, scrollProgress);
       earthGroupRef.current.scale.setScalar(currentScale);
     }
   });
 
   return (
-    <group ref={earthGroupRef} position={[-2.5, -0.2, 0]}>
+    <group ref={earthGroupRef} position={[-3.8, -0.2, 0]}>
       {/* 1. Core Earth Sphere */}
       <mesh ref={earthRef} castShadow receiveShadow>
         <sphereGeometry args={[1.8, 64, 64]} />

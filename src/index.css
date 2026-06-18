@@ -31,8 +31,8 @@ body {
   background-color: var(--bg-dark);
   color: var(--text-primary);
   font-family: var(--font-body);
-  overflow-x: hidden;
-  min-height: 400vh; /* 400vh to support scroll animations */
+  overflow: hidden; /* Prevent scrolling entirely */
+  height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   cursor: none; /* Hide default cursor to use glowing trail */

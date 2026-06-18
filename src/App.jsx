@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Scene from './components/3d/Scene';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
+import CustomCursor from './components/CustomCursor';
 
 function App() {
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -26,6 +27,9 @@ function App() {
 
   return (
     <div className="fade-in-load">
+      {/* Custom Glowing Cursor with Particle Trail */}
+      <CustomCursor />
+
       {/* 3D Interactive WebGL Universe Background */}
       <Scene scrollProgress={scrollProgress} />
 
