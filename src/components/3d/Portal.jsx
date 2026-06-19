@@ -13,7 +13,7 @@ const Portal = ({ scrollProgress = 0 }) => {
     const heroPhase = Math.min(1, scrollProgress * 2);
     const appear = THREE.MathUtils.smoothstep(heroPhase, 0.25, 0.7);
     // Fade out after camera passes through portal into city
-    const fadeOut = 1 - THREE.MathUtils.smoothstep(scrollProgress, 0.55, 0.75);
+    const fadeOut = 1 - THREE.MathUtils.smoothstep(scrollProgress, 0.44, 0.60);
     return appear * fadeOut;
   }, [scrollProgress]);
 

@@ -96,7 +96,7 @@ const Spaceship = ({ scrollProgress = 0 }) => {
     // Thruster scale factors
     let thrusterScale = 1.0;
 
-    if (scrollProgress < 0.25) {
+    if (scrollProgress < 0.20) {
       // Phase 1: Normal Earth Orbit
       finalPos.copy(posOrbit);
       
@@ -104,9 +104,9 @@ const Spaceship = ({ scrollProgress = 0 }) => {
       const tangentZ = Math.cos(data.theta) * orbitRadius;
       const tangentY = Math.cos(data.theta * 1.5) * 0.4 * 1.5;
       targetLook.set(orbitX + tangentX, orbitY + tangentY, orbitZ + tangentZ);
-    } else if (scrollProgress >= 0.25 && scrollProgress < 0.45) {
+    } else if (scrollProgress >= 0.20 && scrollProgress < 0.36) {
       // Transition from Orbit to Warp
-      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.25, 0.45);
+      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.20, 0.36);
       finalPos.lerpVectors(posOrbit, posWarp, t);
       
       // Look direction blends to forward (facing away from camera)
@@ -119,15 +119,15 @@ const Spaceship = ({ scrollProgress = 0 }) => {
       targetLook.lerpVectors(orbitLook, forwardDir, t);
       thrusterScale = 1.0 + t * 4.5; // Fire booster
       isWarping = true;
-    } else if (scrollProgress >= 0.45 && scrollProgress < 0.7) {
+    } else if (scrollProgress >= 0.36 && scrollProgress < 0.56) {
       // Phase 2: Full Warp (centered in front of camera)
       finalPos.copy(posWarp);
       targetLook.set(0, 0, -5).applyQuaternion(cam.quaternion).add(finalPos);
       thrusterScale = 5.5 + Math.sin(time * 25.0) * 0.5; // Pulsing warp drive
       isWarping = true;
-    } else if (scrollProgress >= 0.7 && scrollProgress < 0.85) {
+    } else if (scrollProgress >= 0.56 && scrollProgress < 0.68) {
       // Transition from Warp to Portal Orbit
-      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.7, 0.85);
+      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.56, 0.68);
       finalPos.lerpVectors(posWarp, posPortalOrbit, t);
       
       const portalTangentX = -Math.sin(data.theta * 0.8) * portalRadius;

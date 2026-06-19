@@ -1,0 +1,106 @@
+/* =====================================================
+   INNOVATION GALLERY SECTION — Fifth viewport section
+   ===================================================== */
+
+.innovation-gallery-section {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+  padding: 0 24px;
+  pointer-events: none;
+}
+
+/* ---- Section Heading ---- */
+.gallery-heading {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  will-change: transform, opacity;
+  pointer-events: auto;
+}
+
+.gallery-tagline {
+  font-family: var(--font-cyber);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 5px;
+  color: var(--primary-glow);
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.45);
+  text-transform: uppercase;
+  animation: gallery-pulse-cyan 2s infinite ease-in-out;
+}
+
+@keyframes gallery-pulse-cyan {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.gallery-title {
+  font-family: var(--font-cyber);
+  font-size: clamp(28px, 6vw, 72px);
+  font-weight: 900;
+  letter-spacing: 10px;
+  color: #ffffff;
+  text-transform: uppercase;
+  line-height: 1.1;
+  padding-left: 10px;
+  text-shadow:
+    0 0 15px rgba(0, 240, 255, 0.5),
+    0 0 30px rgba(189, 0, 255, 0.3);
+}
+
+.gallery-subtitle {
+  font-family: var(--font-cyber);
+  font-size: clamp(10px, 1.7vw, 13px);
+  font-weight: 400;
+  letter-spacing: 5px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+/* ---- HUD Frame ---- */
+.gallery-hud-frame {
+  position: absolute;
+  top: 40px;
+  bottom: 40px;
+  left: 40px;
+  right: 40px;
+  border: 1px solid rgba(0, 240, 255, 0.04);
+  pointer-events: none;
+}
+
+.gallery-hud-frame .hud-corner {
+  border-color: rgba(0, 240, 255, 0.22);
+}
+
+/* Interaction instruction */
+.gallery-instruction {
+  position: absolute;
+  bottom: 60px;
+  font-family: var(--font-cyber);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  color: var(--primary-glow);
+  text-transform: uppercase;
+  text-align: center;
+  animation: gallery-pulse-cyan 2s infinite ease-in-out;
+  pointer-events: auto;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 600px) {
+  .gallery-title {
+    letter-spacing: 5px;
+  }
+  .gallery-subtitle {
+    letter-spacing: 3px;
+  }
+}

@@ -163,14 +163,14 @@ const RoboticsLab = ({ scrollProgress = 0 }) => {
   const conveyorBoxRef = useRef([]);
   const warningLightRef = useRef();
 
-  // 1. Calculate opacity based on scroll:
-  // - Fades in between 0.5 and 0.6
-  // - Fades out between 0.75 and 0.92
+  // 1. Calculate opacity based on scroll (5-section layout):
+  // - Fades in between 0.40 and 0.48
+  // - Fades out between 0.60 and 0.74
   const labOpacity = useMemo(() => {
-    if (scrollProgress < 0.75) {
-      return THREE.MathUtils.smoothstep(scrollProgress, 0.5, 0.6);
+    if (scrollProgress < 0.60) {
+      return THREE.MathUtils.smoothstep(scrollProgress, 0.40, 0.48);
     } else {
-      return 1.0 - THREE.MathUtils.smoothstep(scrollProgress, 0.75, 0.92);
+      return 1.0 - THREE.MathUtils.smoothstep(scrollProgress, 0.60, 0.74);
     }
   }, [scrollProgress]);
 

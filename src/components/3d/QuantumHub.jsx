@@ -67,9 +67,9 @@ const QuantumHub = ({ scrollProgress = 0, activeIslandId = null, setActiveIsland
     React.createRef()
   ]);
 
-  // Sector 4 opacity mapping: fades in from 0.8 to 0.92
+  // Sector 4 opacity mapping: fades in from 0.64 to 0.76 (5-section layout)
   const hubOpacity = useMemo(() => {
-    return THREE.MathUtils.smoothstep(scrollProgress, 0.8, 0.92);
+    return THREE.MathUtils.smoothstep(scrollProgress, 0.64, 0.76);
   }, [scrollProgress]);
 
   // Tech Islands data

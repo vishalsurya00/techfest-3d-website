@@ -5,11 +5,13 @@ import HeroSection from './components/HeroSection';
 import AICitySection from './components/AICitySection';
 import RoboticsLabSection from './components/RoboticsLabSection';
 import QuantumHubSection from './components/QuantumHubSection';
+import InnovationGallerySection from './components/InnovationGallerySection';
 import CustomCursor from './components/CustomCursor';
 
 function App() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeIslandId, setActiveIslandId] = useState(null);
+  const [activeCubeId, setActiveCubeId] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,15 +28,16 @@ function App() {
   }, []);
 
   // Derive per-section progress (0-1 within each section's scroll range)
-  // scrollProgress: 0.0→0.25 = Hero | 0.25→0.50 = AI City | 0.50→0.75 = Robotics Lab | 0.75→1.0 = Quantum Hub
-  const heroProgress = Math.min(1, Math.max(0, scrollProgress * 4.0));
-  const cityProgress = Math.min(1, Math.max(0, (scrollProgress - 0.25) * 4.0));
-  const labProgress = Math.min(1, Math.max(0, (scrollProgress - 0.50) * 4.0));
-  const hubProgress = Math.min(1, Math.max(0, (scrollProgress - 0.75) * 4.0));
+  // scrollProgress: 0.0→0.20 = Hero | 0.20→0.40 = AI City | 0.40→0.60 = Robotics Lab | 0.60→0.80 = Quantum Hub | 0.80→1.0 = Innovation Gallery
+  const heroProgress = Math.min(1, Math.max(0, scrollProgress * 5.0));
+  const cityProgress = Math.min(1, Math.max(0, (scrollProgress - 0.20) * 5.0));
+  const labProgress = Math.min(1, Math.max(0, (scrollProgress - 0.40) * 5.0));
+  const hubProgress = Math.min(1, Math.max(0, (scrollProgress - 0.60) * 5.0));
+  const galleryProgress = Math.min(1, Math.max(0, (scrollProgress - 0.80) * 5.0));
 
   // Portal Title: appears near end of hero phase, fades as city phase begins
-  const portalFadeIn = Math.max(0, Math.min(1, (scrollProgress - 0.17) * 12));
-  const portalFadeOut = Math.max(0, Math.min(1, 1 - (scrollProgress - 0.25) * 12));
+  const portalFadeIn = Math.max(0, Math.min(1, (scrollProgress - 0.14) * 15));
+  const portalFadeOut = Math.max(0, Math.min(1, 1 - (scrollProgress - 0.20) * 15));
   const portalTitleOpacity = portalFadeIn * portalFadeOut;
   const portalTitleTranslateY = 20 - portalFadeIn * 20;
 
@@ -44,7 +47,7 @@ function App() {
       <CustomCursor />
 
       {/* 3D Interactive WebGL Universe Background */}
-      <Scene scrollProgress={scrollProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} />
+      <Scene scrollProgress={scrollProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} activeCubeId={activeCubeId} setActiveCubeId={setActiveCubeId} />
 
       <div className="fade-in-load">
         {/* Floating Glassmorphism Navbar */}
@@ -61,6 +64,9 @@ function App() {
 
         {/* Quantum Innovation Hub Section (scroll-animated HTML overlay) */}
         <QuantumHubSection scrollProgress={hubProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} />
+
+        {/* Innovation Gallery Section (scroll-animated HTML overlay) */}
+        <InnovationGallerySection scrollProgress={galleryProgress} activeCubeId={activeCubeId} />
 
         {/* Portal Title Overlay (fixed, transitions between sections) */}
         <div 

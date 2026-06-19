@@ -33,7 +33,7 @@ body {
   font-family: var(--font-body);
   overflow-y: auto; /* Enable vertical scroll */
   overflow-x: hidden;
-  min-height: 500vh; /* 500vh: Hero (100vh) + Portal transition + AI City (100vh) + Robotics Lab (100vh) + Quantum Hub (100vh) */
+  min-height: 600vh; /* 600vh: Hero (100vh) + Portal transition + AI City (100vh) + Robotics Lab (100vh) + Quantum Hub (100vh) + Innovation Gallery (100vh) */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   cursor: none; /* Hide default cursor to use glowing trail */
@@ -168,6 +168,11 @@ a, button {
   height: 100vh;
   z-index: 0;
   pointer-events: auto;
+  transition: filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.webgl-canvas.gallery-blur {
+  filter: blur(4px) brightness(0.65);
 }
 
 /* Let clicks pass through default layout wrapper but enable them on child components */

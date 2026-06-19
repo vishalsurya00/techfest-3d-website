@@ -9,17 +9,19 @@ import Portal from './Portal';
 import AICity from './AICity';
 import RoboticsLab from './RoboticsLab';
 import QuantumHub from './QuantumHub';
+import InnovationGallery from './InnovationGallery';
 
 // Inner component to access R3F hooks (useFrame, useThree)
-const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId }) => {
+const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId, activeCubeId = null, setActiveCubeId }) => {
   const { camera, scene } = useThree();
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
-  // Derive per-section progress for sub-components
-  const heroProgress = Math.min(1, Math.max(0, scrollProgress * 4.0));
-  const cityProgress = Math.min(1, Math.max(0, (scrollProgress - 0.25) * 4.0));
-  const labProgress = Math.min(1, Math.max(0, (scrollProgress - 0.50) * 4.0));
-  const hubProgress = Math.min(1, Math.max(0, (scrollProgress - 0.75) * 4.0));
+  // Derive per-section progress for sub-components (5 sections now)
+  const heroProgress = Math.min(1, Math.max(0, scrollProgress * 5.0));
+  const cityProgress = Math.min(1, Math.max(0, (scrollProgress - 0.20) * 5.0));
+  const labProgress = Math.min(1, Math.max(0, (scrollProgress - 0.40) * 5.0));
+  const hubProgress = Math.min(1, Math.max(0, (scrollProgress - 0.60) * 5.0));
+  const galleryProgress = Math.min(1, Math.max(0, (scrollProgress - 0.80) * 5.0));
 
   // Handle mouse movement for parallax
   useEffect(() => {
@@ -37,7 +39,7 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
 
-    // 1. Camera Positions & Targets — three-phase scroll timeline
+    // 1. Camera Positions & Targets — five-phase scroll timeline
     let targetCamPos = new THREE.Vector3();
     let targetLookAt = new THREE.Vector3();
     let shakeIntensity = 0;
@@ -48,27 +50,28 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
     const cityFogColor = new THREE.Color('#0a0520');
     const labFogColor = new THREE.Color('#080b18');
     const hubFogColor = new THREE.Color('#030107');
+    const galleryFogColor = new THREE.Color('#040212');
 
     let currentFogColor = new THREE.Color();
     let currentFogDensity = 0.0018;
 
-    if (scrollProgress <= 0.25) {
-      // ---- PHASE 1: Hero → Portal (scrollProgress 0.0 to 0.25) ----
-      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.0, 0.25);
+    if (scrollProgress <= 0.20) {
+      // ---- PHASE 1: Hero → Portal (scrollProgress 0.0 to 0.20) ----
+      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.0, 0.20);
 
       const z = THREE.MathUtils.lerp(5.8, 1.2, t);
       targetCamPos.set(0, 0, z);
       targetLookAt.set(0, 0, -6.0);
 
-      const shakeP = THREE.MathUtils.smoothstep(scrollProgress, 0.05, 0.22);
+      const shakeP = THREE.MathUtils.smoothstep(scrollProgress, 0.04, 0.18);
       shakeIntensity = Math.sin(shakeP * Math.PI) * 0.022;
 
       currentFogColor.lerpColors(spaceColor, portalColor, t);
       currentFogDensity = THREE.MathUtils.lerp(0.0018, 0.005, t);
 
-    } else if (scrollProgress > 0.25 && scrollProgress <= 0.5) {
-      // ---- PHASE 2: Portal → AI City (scrollProgress 0.25 to 0.5) ----
-      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.25, 0.5);
+    } else if (scrollProgress > 0.20 && scrollProgress <= 0.40) {
+      // ---- PHASE 2: Portal → AI City (scrollProgress 0.20 to 0.40) ----
+      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.20, 0.40);
 
       const z = THREE.MathUtils.lerp(1.2, -38, t);
       const y = THREE.MathUtils.lerp(0, 8, t);
@@ -78,15 +81,15 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
       const lookZ = THREE.MathUtils.lerp(-6.0, -60, t);
       targetLookAt.set(0, lookY, lookZ);
 
-      const shakeP2 = THREE.MathUtils.smoothstep(scrollProgress, 0.25, 0.35);
+      const shakeP2 = THREE.MathUtils.smoothstep(scrollProgress, 0.20, 0.28);
       shakeIntensity = Math.sin(shakeP2 * Math.PI) * 0.015;
 
       currentFogColor.lerpColors(portalColor, cityFogColor, t);
       currentFogDensity = THREE.MathUtils.lerp(0.005, 0.008, t);
 
-    } else if (scrollProgress > 0.5 && scrollProgress <= 0.75) {
-      // ---- PHASE 3: AI City → Robotics Lab (scrollProgress 0.5 to 0.75) ----
-      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.5, 0.75);
+    } else if (scrollProgress > 0.40 && scrollProgress <= 0.60) {
+      // ---- PHASE 3: AI City → Robotics Lab (scrollProgress 0.40 to 0.60) ----
+      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.40, 0.60);
 
       const z = THREE.MathUtils.lerp(-38, -112.5, t);
       const y = THREE.MathUtils.lerp(8, -1.5, t);
@@ -96,17 +99,16 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
       const lookZ = THREE.MathUtils.lerp(-60, -120, t);
       targetLookAt.set(0, lookY, lookZ);
 
-      const shakeP3 = THREE.MathUtils.smoothstep(scrollProgress, 0.5, 0.62);
+      const shakeP3 = THREE.MathUtils.smoothstep(scrollProgress, 0.40, 0.50);
       shakeIntensity = Math.sin(shakeP3 * Math.PI) * 0.01;
 
       currentFogColor.lerpColors(cityFogColor, labFogColor, t);
       currentFogDensity = THREE.MathUtils.lerp(0.008, 0.011, t);
 
-    } else {
-      // ---- PHASE 4: Robotics Lab → Quantum Hub (scrollProgress 0.75 to 1.0) ----
-      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.75, 1.0);
+    } else if (scrollProgress > 0.60 && scrollProgress <= 0.80) {
+      // ---- PHASE 4: Robotics Lab → Quantum Hub (scrollProgress 0.60 to 0.80) ----
+      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.60, 0.80);
 
-      // Camera flies deeper from lab to overview the Quantum Hub
       const z = THREE.MathUtils.lerp(-112.5, -177.0, t);
       const y = THREE.MathUtils.lerp(-1.5, 3.5, t);
       targetCamPos.set(0, y, z);
@@ -120,14 +122,35 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
 
       // Cinematic Island Zoom override in Phase 4
       if (activeIslandId !== null && t > 0.8) {
-        // Compute active island's orbiting coordinates to zoom the camera smoothly
         const angle = (activeIslandId * Math.PI * 2) / 5 + time * 0.12;
         const islandX = Math.cos(angle) * 6.5;
         const islandZ = -190 + Math.sin(angle) * 6.5;
-        const islandY = -1.0 + Math.sin(time * 1.5 + activeIslandId) * 0.35 + 0.4; // with lift
+        const islandY = -1.0 + Math.sin(time * 1.5 + activeIslandId) * 0.35 + 0.4;
 
         targetCamPos.set(islandX * 0.62, islandY + 1.2, islandZ + 4.6);
         targetLookAt.set(islandX, islandY, islandZ);
+      }
+
+    } else {
+      // ---- PHASE 5: Quantum Hub → Innovation Gallery (scrollProgress 0.80 to 1.0) ----
+      const t = THREE.MathUtils.smoothstep(scrollProgress, 0.80, 1.0);
+
+      const z = THREE.MathUtils.lerp(-177.0, -248.0, t);
+      const y = THREE.MathUtils.lerp(3.5, 4.0, t);
+      targetCamPos.set(0, y, z);
+
+      const lookY = THREE.MathUtils.lerp(0.0, -0.5, t);
+      const lookZ = THREE.MathUtils.lerp(-190, -260, t);
+      targetLookAt.set(0, lookY, lookZ);
+
+      currentFogColor.lerpColors(hubFogColor, galleryFogColor, t);
+      currentFogDensity = THREE.MathUtils.lerp(0.008, 0.006, t);
+
+      // Cinematic Cube Zoom override in Phase 5
+      if (activeCubeId !== null && t > 0.8) {
+        // Cubes are at position [0, 0, -260] + individual position
+        targetCamPos.set(0, 4.5, -255);
+        targetLookAt.set(0, -0.5, -260);
       }
     }
 
@@ -199,6 +222,9 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
       {/* 3D Quantum Innovation Hub — uses raw scrollProgress for fading */}
       <QuantumHub scrollProgress={scrollProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} />
 
+      {/* 3D Innovation Gallery — uses raw scrollProgress for fading */}
+      <InnovationGallery scrollProgress={scrollProgress} activeCubeId={activeCubeId} setActiveCubeId={setActiveCubeId} />
+
       {/* Background starfield and nebula — uses raw scrollProgress, computes heroPhase internally */}
       <Starfield scrollProgress={scrollProgress} />
       <Nebula scrollProgress={scrollProgress} />
@@ -222,9 +248,9 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
   );
 };
 
-const Scene = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId }) => {
+const Scene = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId, activeCubeId = null, setActiveCubeId }) => {
   return (
-    <div className="webgl-canvas">
+    <div className={`webgl-canvas ${activeCubeId !== null ? 'gallery-blur' : ''}`}>
       <Canvas
         camera={{ position: [0, 0, 5.8], fov: 45, near: 0.1, far: 2000 }}
         shadows
@@ -235,7 +261,7 @@ const Scene = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId })
           gl.toneMappingExposure = 1.1;
         }}
       >
-        <SceneContent scrollProgress={scrollProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} />
+        <SceneContent scrollProgress={scrollProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} activeCubeId={activeCubeId} setActiveCubeId={setActiveCubeId} />
       </Canvas>
     </div>
   );
