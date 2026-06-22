@@ -11,6 +11,7 @@ const TechIsland = ({
   isActive,
   onClick,
   hubOpacity = 1.0,
+  isPaused = false,
 }) => {
   const islandRef = useRef();
   const ringRef = useRef();
@@ -23,8 +24,14 @@ const TechIsland = ({
   const glowFactor = useRef(1.0);
   const scaleFactor = useRef(1.0);
 
+  // Local clock ref that pauses when selection is active
+  const timeRef = useRef(0);
+
   useFrame((state, delta) => {
-    const time = state.clock.getElapsedTime();
+    if (!isPaused) {
+      timeRef.current += delta;
+    }
+    const time = timeRef.current;
 
     // 1. Independent floating bobbing
     const bob = Math.sin(time * 1.2 + index * 1.5) * 0.22;

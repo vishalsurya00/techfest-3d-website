@@ -14,38 +14,66 @@ const InnovationGallerySection = ({ scrollProgress = 0, activeCubeId }) => {
 
   return (
     <section className="innovation-gallery-section">
-      {/* HUD Frame */}
-      <div className="gallery-hud-frame" style={{ opacity: hudOpacity }}>
-        <div className="hud-corner hud-corner-tl" />
-        <div className="hud-corner hud-corner-tr" />
-        <div className="hud-corner hud-corner-bl" />
-        <div className="hud-corner hud-corner-br" />
-      </div>
+      {/* Invisible Snap Points */}
+      <div 
+        className="gallery-snap-start" 
+        style={{ 
+          position: 'absolute', 
+          top: 0, 
+          height: '1px', 
+          width: '1px', 
+          scrollSnapAlign: 'start', 
+          scrollSnapStop: 'always', 
+          pointerEvents: 'none' 
+        }} 
+      />
+      <div 
+        className="gallery-snap-end" 
+        style={{ 
+          position: 'absolute', 
+          top: '100vh', 
+          height: '1px', 
+          width: '1px', 
+          scrollSnapAlign: 'start', 
+          scrollSnapStop: 'always', 
+          pointerEvents: 'none' 
+        }} 
+      />
 
-      {/* Section Heading */}
-      <div
-        className="gallery-heading"
-        style={{
-          opacity: headingOpacity,
-          transform: `translateY(${headingY}px)`,
-        }}
-      >
-        <span className="gallery-tagline">// SECTOR 05 — EXHIBITION HALL</span>
-        <h2 className="gallery-title">INNOVATION GALLERY</h2>
-        <p className="gallery-subtitle">Holographic Technology Exhibition</p>
-      </div>
+      <div className="gallery-sticky-content">
+        {/* HUD Frame */}
+        <div className="gallery-hud-frame" style={{ opacity: hudOpacity }}>
+          <div className="hud-corner hud-corner-tl" />
+          <div className="hud-corner hud-corner-tr" />
+          <div className="hud-corner hud-corner-bl" />
+          <div className="hud-corner hud-corner-br" />
+        </div>
 
-      {/* Interactive Instructions */}
-      <div
-        className="gallery-instruction"
-        style={{ opacity: instructionOpacity }}
-      >
-        <span>
-          {activeCubeId !== null
-            ? "[ CLICK OUTSIDE CUBE TO RETURN ]"
-            : "[ HOVER & CLICK CUBES TO EXPLORE TECHNOLOGIES ]"
-          }
-        </span>
+        {/* Section Heading */}
+        <div
+          className="gallery-heading"
+          style={{
+            opacity: headingOpacity,
+            transform: `translateY(${headingY}px)`,
+          }}
+        >
+          <span className="gallery-tagline">// SECTOR 05 — EXHIBITION HALL</span>
+          <h2 className="gallery-title">INNOVATION GALLERY</h2>
+          <p className="gallery-subtitle">Holographic Technology Exhibition</p>
+        </div>
+
+        {/* Interactive Instructions */}
+        <div
+          className="gallery-instruction"
+          style={{ opacity: instructionOpacity }}
+        >
+          <span>
+            {activeCubeId !== null
+              ? "[ CLICK OUTSIDE CUBE TO RETURN ]"
+              : "[ HOVER & CLICK CUBES TO EXPLORE TECHNOLOGIES ]"
+            }
+          </span>
+        </div>
       </div>
     </section>
   );

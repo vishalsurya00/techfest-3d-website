@@ -7,6 +7,8 @@ import RoboticsLabSection from './components/RoboticsLabSection';
 import QuantumHubSection from './components/QuantumHubSection';
 import InnovationGallerySection from './components/InnovationGallerySection';
 import CustomCursor from './components/CustomCursor';
+import Modal from './components/Modal';
+import { islands, cubes } from './data/universeData';
 
 function App() {
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -88,6 +90,29 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* Centered Glassmorphism Details Modals */}
+      {activeIslandId !== null && (
+        <Modal
+          isOpen={activeIslandId !== null}
+          onClose={() => setActiveIslandId(null)}
+          title={islands[activeIslandId].title}
+          description={islands[activeIslandId].description}
+          icon={islands[activeIslandId].icon}
+          color={islands[activeIslandId].color}
+        />
+      )}
+      {activeCubeId !== null && (
+        <Modal
+          isOpen={activeCubeId !== null}
+          onClose={() => setActiveCubeId(null)}
+          title={cubes[activeCubeId].title}
+          description={cubes[activeCubeId].description}
+          icon={cubes[activeCubeId].icon}
+          color={cubes[activeCubeId].color}
+          futureApps={cubes[activeCubeId].futureApps}
+        />
+      )}
     </>
   );
 }

@@ -2,13 +2,17 @@ import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const HologramRing = ({ color = '#00f0ff', radius = 0.8, speed = 1.0, opacity = 1.0 }) => {
+const HologramRing = ({ color = '#00f0ff', radius = 0.8, speed = 1.0, opacity = 1.0, isPaused = false }) => {
   const ring1Ref = useRef();
   const ring2Ref = useRef();
   const ring3Ref = useRef();
+  const timeRef = useRef(0);
 
-  useFrame((state) => {
-    const time = state.clock.getElapsedTime();
+  useFrame((state, delta) => {
+    if (!isPaused) {
+      timeRef.current += delta;
+    }
+    const time = timeRef.current;
 
     if (ring1Ref.current) {
       ring1Ref.current.rotation.x = Math.PI / 2;

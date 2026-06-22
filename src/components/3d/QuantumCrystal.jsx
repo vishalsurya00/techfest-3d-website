@@ -2,7 +2,7 @@ import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const QuantumCrystal = ({ hubOpacity = 1.0 }) => {
+const QuantumCrystal = ({ hubOpacity = 1.0, isPaused = false }) => {
   const crystalGroupRef = useRef();
   const ring1Ref = useRef();
   const ring2Ref = useRef();
@@ -23,8 +23,13 @@ const QuantumCrystal = ({ hubOpacity = 1.0 }) => {
     return arr;
   }, []);
 
-  useFrame((state) => {
-    const time = state.clock.getElapsedTime();
+  const timeRef = useRef(0);
+
+  useFrame((state, delta) => {
+    if (!isPaused) {
+      timeRef.current += delta;
+    }
+    const time = timeRef.current;
 
     // 1. Crystal main group rotation & pulsing scale
     if (crystalGroupRef.current) {

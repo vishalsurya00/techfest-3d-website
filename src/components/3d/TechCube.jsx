@@ -13,6 +13,7 @@ const TechCube = ({
   centerPosition = [0, 0, 0],
   onClick,
   galleryOpacity = 1.0,
+  isPaused = false,
 }) => {
   const groupRef = useRef();
   const cubeRef = useRef();
@@ -29,6 +30,9 @@ const TechCube = ({
   const lerpedZ = useRef(position[2]);
   const lerpedParticleSpeed = useRef(1.0);
   const lerpedSpeedMultiplier = useRef(1.0);
+
+  // Local clock ref that pauses when selection is active
+  const timeRef = useRef(0);
 
   // Local particles orbiting the cube
   const particleCount = 35;
@@ -47,7 +51,10 @@ const TechCube = ({
   }, []);
 
   useFrame((state, delta) => {
-    const time = state.clock.getElapsedTime();
+    if (!isPaused) {
+      timeRef.current += delta;
+    }
+    const time = timeRef.current;
 
     // 1. Floating bob
     const bob = Math.sin(time * 1.0 + index * 0.8) * 0.18;
@@ -64,9 +71,9 @@ const TechCube = ({
     const targetGlow = hovered ? 3.0 : isActive ? 2.2 : 1.0;
     lerpedGlow.current = THREE.MathUtils.lerp(lerpedGlow.current, targetGlow, delta * 5.0);
 
-    // 5. Move toward center when active
-    const targetX = isActive ? centerPosition[0] : position[0];
-    const targetZ = isActive ? centerPosition[2] : position[2];
+    // 5. Keep cube in its orbit position (active cube does not move to center anymore)
+    const targetX = position[0];
+    const targetZ = position[2];
     lerpedX.current = THREE.MathUtils.lerp(lerpedX.current, targetX, delta * 3.0);
     lerpedZ.current = THREE.MathUtils.lerp(lerpedZ.current, targetZ, delta * 3.0);
 
@@ -195,6 +202,7 @@ const TechCube = ({
         radius={0.7}
         speed={(0.8 + index * 0.1) * lerpedSpeedMultiplier.current}
         opacity={galleryOpacity}
+        isPaused={isPaused}
       />
 
       {/* Label */}
