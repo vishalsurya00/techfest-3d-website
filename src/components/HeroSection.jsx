@@ -76,7 +76,7 @@ const HeroSection = ({ scrollProgress = 0 }) => {
           <div className="enter-btn-wrapper">
             <button 
               className="enter-btn"
-              onClick={() => console.log("Initializing Universe Shift...")}
+              onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
             >
               Enter Universe
               <svg className="enter-btn-arrow" viewBox="0 0 24 24">

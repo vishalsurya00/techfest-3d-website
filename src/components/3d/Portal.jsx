@@ -2,20 +2,23 @@ import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const Portal = ({ scrollProgress = 0 }) => {
+const Portal = ({ scrollProgress = 0, position = [0, 0, -6.0], isFinal = false }) => {
   const portalRef = useRef();
   const discRef = useRef();
   const pointsRef = useRef();
   const lightRef = useRef();
 
-  // 1. Calculate portal opacity: fades in during hero phase, fades out as camera passes through
+  // 1. Calculate portal opacity dynamically based on whether it is the final portal or first portal
   const portalOpacity = useMemo(() => {
-    const heroPhase = Math.min(1, scrollProgress * 2);
-    const appear = THREE.MathUtils.smoothstep(heroPhase, 0.25, 0.7);
-    // Fade out after camera passes through portal into city
-    const fadeOut = 1 - THREE.MathUtils.smoothstep(scrollProgress, 0.44, 0.60);
-    return appear * fadeOut;
-  }, [scrollProgress]);
+    if (isFinal) {
+      const finalPhase = Math.min(1, Math.max(0, (scrollProgress - 0.833) * 6.0));
+      return THREE.MathUtils.smoothstep(finalPhase, 0.0, 0.45);
+    } else {
+      const appear = THREE.MathUtils.smoothstep(scrollProgress, 0.04, 0.12);
+      const fadeOut = 1 - THREE.MathUtils.smoothstep(scrollProgress, 0.167, 0.23);
+      return appear * fadeOut;
+    }
+  }, [scrollProgress, isFinal]);
 
   // 2. Swirling energy disc ShaderMaterial
   const portalShader = useMemo(() => {
@@ -164,7 +167,7 @@ const Portal = ({ scrollProgress = 0 }) => {
   if (portalOpacity <= 0) return null;
 
   return (
-    <group ref={portalRef} position={[0, 0, -6.0]}>
+    <group ref={portalRef} position={position}>
       {/* A. Core Swirling Energy Disc */}
       <mesh ref={discRef}>
         <circleGeometry args={[2.0, 64]} />

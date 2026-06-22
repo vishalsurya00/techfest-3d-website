@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import Starfield from './Starfield';
@@ -43,6 +43,7 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
   useFrame((state, delta) => {
     // 0. Update custom time tracking (freezes when active item is selected)
     const isPaused = activeIslandId !== null || activeCubeId !== null;
+    const isZoomed = isPaused;
     if (!isPaused) {
       timeRef.current += delta;
     }
@@ -58,12 +59,13 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
     );
     const p = smoothScroll.current;
 
-    // Derive per-section progress for sub-components
-    const heroProgress = Math.min(1, Math.max(0, p * 5.0));
-    const cityProgress = Math.min(1, Math.max(0, (p - 0.20) * 5.0));
-    const labProgress = Math.min(1, Math.max(0, (p - 0.40) * 5.0));
-    const hubProgress = Math.min(1, Math.max(0, (p - 0.60) * 5.0));
-    const galleryProgress = Math.min(1, Math.max(0, (p - 0.80) * 5.0));
+    // Derive per-section progress for sub-components (6 sections)
+    const heroProgress = Math.min(1, Math.max(0, p * 6.0));
+    const cityProgress = Math.min(1, Math.max(0, (p - 0.1667) * 6.0));
+    const labProgress = Math.min(1, Math.max(0, (p - 0.3333) * 6.0));
+    const hubProgress = Math.min(1, Math.max(0, (p - 0.50) * 6.0));
+    const galleryProgress = Math.min(1, Math.max(0, (p - 0.6667) * 6.0));
+    const portalProgress = Math.min(1, Math.max(0, (p - 0.8333) * 6.0));
 
     // 1. Camera Positions & Targets — five-phase scroll timeline
     let scrollCamPos = new THREE.Vector3();
@@ -81,80 +83,94 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
     let currentFogColor = new THREE.Color();
     let currentFogDensity = 0.0018;
 
-    if (p <= 0.20) {
-      // ---- PHASE 1: Hero → Portal ----
-      const t = THREE.MathUtils.smoothstep(p, 0.0, 0.20);
+    if (p <= 0.1667) {
+      // ---- PHASE 1: Space Gateway (Hero) ----
+      const t = THREE.MathUtils.smoothstep(p, 0.0, 0.1667);
       const z = THREE.MathUtils.lerp(5.8, 1.2, t);
       scrollCamPos.set(0, 0, z);
       scrollLookAt.set(0, 0, -6.0);
 
-      const shakeP = THREE.MathUtils.smoothstep(p, 0.04, 0.18);
+      const shakeP = THREE.MathUtils.smoothstep(p, 0.03, 0.15);
       shakeIntensity = Math.sin(shakeP * Math.PI) * 0.022;
 
       currentFogColor.lerpColors(spaceColor, portalColor, t);
       currentFogDensity = THREE.MathUtils.lerp(0.0018, 0.005, t);
 
-    } else if (p > 0.20 && p <= 0.40) {
-      // ---- PHASE 2: Portal → AI City ----
-      const t = THREE.MathUtils.smoothstep(p, 0.20, 0.40);
-      const z = THREE.MathUtils.lerp(1.2, -38, t);
-      const y = THREE.MathUtils.lerp(0, 8, t);
+    } else if (p > 0.1667 && p <= 0.3333) {
+      // ---- PHASE 2: AI City ----
+      const t = THREE.MathUtils.smoothstep(p, 0.1667, 0.3333);
+      const z = THREE.MathUtils.lerp(1.2, -38.0, t);
+      const y = THREE.MathUtils.lerp(0, 8.0, t);
       scrollCamPos.set(0, y, z);
 
-      const lookY = THREE.MathUtils.lerp(0, -3, t);
-      const lookZ = THREE.MathUtils.lerp(-6.0, -60, t);
+      const lookY = THREE.MathUtils.lerp(0, -3.0, t);
+      const lookZ = THREE.MathUtils.lerp(-6.0, -60.0, t);
       scrollLookAt.set(0, lookY, lookZ);
 
-      const shakeP2 = THREE.MathUtils.smoothstep(p, 0.20, 0.28);
+      const shakeP2 = THREE.MathUtils.smoothstep(p, 0.1667, 0.24);
       shakeIntensity = Math.sin(shakeP2 * Math.PI) * 0.015;
 
       currentFogColor.lerpColors(portalColor, cityFogColor, t);
       currentFogDensity = THREE.MathUtils.lerp(0.005, 0.008, t);
 
-    } else if (p > 0.40 && p <= 0.60) {
-      // ---- PHASE 3: AI City → Robotics Lab ----
-      const t = THREE.MathUtils.smoothstep(p, 0.40, 0.60);
-      const z = THREE.MathUtils.lerp(-38, -112.5, t);
-      const y = THREE.MathUtils.lerp(8, -1.5, t);
+    } else if (p > 0.3333 && p <= 0.50) {
+      // ---- PHASE 3: Robotics Lab ----
+      const t = THREE.MathUtils.smoothstep(p, 0.3333, 0.50);
+      const z = THREE.MathUtils.lerp(-38.0, -112.5, t);
+      const y = THREE.MathUtils.lerp(8.0, -1.5, t);
       scrollCamPos.set(0, y, z);
 
-      const lookY = THREE.MathUtils.lerp(-3, -1.8, t);
-      const lookZ = THREE.MathUtils.lerp(-60, -120, t);
+      const lookY = THREE.MathUtils.lerp(-3.0, -1.8, t);
+      const lookZ = THREE.MathUtils.lerp(-60.0, -120.0, t);
       scrollLookAt.set(0, lookY, lookZ);
 
-      const shakeP3 = THREE.MathUtils.smoothstep(p, 0.40, 0.50);
+      const shakeP3 = THREE.MathUtils.smoothstep(p, 0.3333, 0.42);
       shakeIntensity = Math.sin(shakeP3 * Math.PI) * 0.01;
 
       currentFogColor.lerpColors(cityFogColor, labFogColor, t);
       currentFogDensity = THREE.MathUtils.lerp(0.008, 0.011, t);
 
-    } else if (p > 0.60 && p <= 0.80) {
-      // ---- PHASE 4: Robotics Lab → Quantum Hub ----
-      const t = THREE.MathUtils.smoothstep(p, 0.60, 0.80);
+    } else if (p > 0.50 && p <= 0.6667) {
+      // ---- PHASE 4: Quantum Hub ----
+      const t = THREE.MathUtils.smoothstep(p, 0.50, 0.6667);
       const z = THREE.MathUtils.lerp(-112.5, -177.0, t);
       const y = THREE.MathUtils.lerp(-1.5, 3.5, t);
       scrollCamPos.set(0, y, z);
 
       const lookY = THREE.MathUtils.lerp(-1.8, 0.0, t);
-      const lookZ = THREE.MathUtils.lerp(-120, -190, t);
+      const lookZ = THREE.MathUtils.lerp(-120.0, -190.0, t);
       scrollLookAt.set(0, lookY, lookZ);
 
       currentFogColor.lerpColors(labFogColor, hubFogColor, t);
       currentFogDensity = THREE.MathUtils.lerp(0.011, 0.008, t);
 
-    } else {
-      // ---- PHASE 5: Quantum Hub → Innovation Gallery ----
-      const t = THREE.MathUtils.smoothstep(p, 0.80, 1.0);
+    } else if (p > 0.6667 && p <= 0.8333) {
+      // ---- PHASE 5: Innovation Gallery ----
+      const t = THREE.MathUtils.smoothstep(p, 0.6667, 0.8333);
       const z = THREE.MathUtils.lerp(-177.0, -248.0, t);
       const y = THREE.MathUtils.lerp(3.5, 4.0, t);
       scrollCamPos.set(0, y, z);
 
       const lookY = THREE.MathUtils.lerp(0.0, -0.5, t);
-      const lookZ = THREE.MathUtils.lerp(-190, -260, t);
+      const lookZ = THREE.MathUtils.lerp(-190.0, -260.0, t);
       scrollLookAt.set(0, lookY, lookZ);
 
       currentFogColor.lerpColors(hubFogColor, galleryFogColor, t);
       currentFogDensity = THREE.MathUtils.lerp(0.008, 0.006, t);
+
+    } else {
+      // ---- PHASE 6: Final Portal ----
+      const t = THREE.MathUtils.smoothstep(p, 0.8333, 1.0);
+      const z = THREE.MathUtils.lerp(-248.0, -315.0, t);
+      const y = THREE.MathUtils.lerp(4.0, 1.5, t);
+      scrollCamPos.set(0, y, z);
+
+      const lookY = THREE.MathUtils.lerp(-0.5, 0.0, t);
+      const lookZ = THREE.MathUtils.lerp(-260.0, -325.0, t);
+      scrollLookAt.set(0, lookY, lookZ);
+
+      currentFogColor.lerpColors(galleryFogColor, portalColor, t);
+      currentFogDensity = THREE.MathUtils.lerp(0.006, 0.004, t);
     }
 
     // 1.5. Calculate Zoom Camera Position and Target if selected
@@ -260,8 +276,11 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
         <Spaceship scrollProgress={heroProgress} />
       </group>
 
-      {/* 3D Glowing Portal — uses raw scrollProgress for appear + fade-out */}
-      <Portal scrollProgress={scrollProgress} />
+      {/* 3D Glowing Portal — first portal */}
+      <Portal scrollProgress={scrollProgress} position={[0, 0, -6.0]} isFinal={false} />
+
+      {/* 3D Glowing Portal — second/final portal at Z = -320 */}
+      <Portal scrollProgress={scrollProgress} position={[0, 0, -320.0]} isFinal={true} />
 
       {/* 3D AI City — uses raw scrollProgress for opacity timing */}
       <AICity scrollProgress={scrollProgress} />

@@ -1,0 +1,195 @@
+/* =====================================================
+   FINAL PORTAL SECTION — Sixth viewport section
+   ===================================================== */
+
+.final-portal-section {
+  position: relative;
+  width: 100vw;
+  height: 200vh;
+  z-index: 50;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.portal-sticky-content {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 24px;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+/* ---- Section Heading ---- */
+.final-portal-heading {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  will-change: transform, opacity;
+  pointer-events: auto;
+}
+
+.final-portal-tagline {
+  font-family: var(--font-cyber);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 5px;
+  color: var(--accent-glow);
+  text-shadow: 0 0 10px rgba(255, 0, 122, 0.45);
+  text-transform: uppercase;
+  animation: portal-pulse-pink 2s infinite ease-in-out;
+}
+
+@keyframes portal-pulse-pink {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.final-portal-title {
+  font-family: var(--font-cyber);
+  font-size: clamp(28px, 6vw, 72px);
+  font-weight: 900;
+  letter-spacing: 10px;
+  color: #ffffff;
+  text-transform: uppercase;
+  line-height: 1.1;
+  padding-left: 10px;
+  text-shadow:
+    0 0 15px rgba(189, 0, 255, 0.6),
+    0 0 30px rgba(0, 240, 255, 0.4);
+}
+
+.final-portal-subtitle {
+  font-family: var(--font-cyber);
+  font-size: clamp(10px, 1.7vw, 13px);
+  font-weight: 400;
+  letter-spacing: 5px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+/* ---- HUD Frame ---- */
+.portal-hud-frame {
+  position: absolute;
+  top: 40px;
+  bottom: 40px;
+  left: 40px;
+  right: 40px;
+  border: 1px solid rgba(189, 0, 255, 0.04);
+  pointer-events: none;
+}
+
+.portal-hud-frame .hud-corner {
+  border-color: rgba(189, 0, 255, 0.3);
+}
+
+/* ---- CTA Sci-Fi Button ---- */
+.portal-cta-wrapper {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  will-change: transform, opacity;
+}
+
+.portal-enter-btn {
+  background: transparent;
+  border: 1px solid var(--primary-glow);
+  color: #ffffff;
+  padding: 16px 36px;
+  font-family: var(--font-cyber);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 0 15px rgba(0, 240, 255, 0.2),
+    inset 0 0 15px rgba(0, 240, 255, 0.1);
+  transition: var(--transition-smooth);
+}
+
+.portal-enter-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 240, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.portal-enter-btn:hover {
+  transform: scale(1.05);
+  border-color: var(--secondary-glow);
+  box-shadow: 
+    0 0 25px rgba(189, 0, 255, 0.4),
+    inset 0 0 20px rgba(189, 0, 255, 0.2);
+  text-shadow: 0 0 5px #ffffff;
+}
+
+.portal-enter-btn:hover::before {
+  left: 100%;
+}
+
+.portal-btn-svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.portal-enter-btn:hover .portal-btn-svg {
+  transform: translateX(4px);
+  color: var(--secondary-glow);
+}
+
+/* Interaction instruction */
+.final-portal-instruction {
+  position: absolute;
+  bottom: 60px;
+  font-family: var(--font-cyber);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  color: var(--primary-glow);
+  text-transform: uppercase;
+  text-align: center;
+  animation: portal-pulse-cyan 2.8s infinite ease-in-out;
+  pointer-events: auto;
+}
+
+@keyframes portal-pulse-cyan {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 600px) {
+  .final-portal-title {
+    letter-spacing: 5px;
+  }
+  .final-portal-subtitle {
+    letter-spacing: 3px;
+  }
+  .portal-enter-btn {
+    padding: 12px 28px;
+    font-size: 12px;
+  }
+}

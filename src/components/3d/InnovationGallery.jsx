@@ -179,9 +179,11 @@ const CentralPlatform = ({ opacity = 1.0, isPaused = false }) => {
 const InnovationGallery = ({ scrollProgress = 0, activeCubeId = null, setActiveCubeId }) => {
   const isPaused = activeCubeId !== null;
 
-  // Gallery fades in during its scroll phase (0.8→0.92 of raw progress)
+  // Gallery fades in during its scroll phase (6-section layout: 0.6667 to 0.8333)
   const galleryOpacity = useMemo(() => {
-    return THREE.MathUtils.smoothstep(scrollProgress, 0.84, 0.94);
+    const fadeIn = THREE.MathUtils.smoothstep(scrollProgress, 0.6667, 0.70);
+    const fadeOut = 1.0 - THREE.MathUtils.smoothstep(scrollProgress, 0.79, 0.8333);
+    return fadeIn * fadeOut;
   }, [scrollProgress]);
 
   // Arrange cubes in a circle with larger radius

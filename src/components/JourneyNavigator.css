@@ -1,0 +1,168 @@
+.journey-navigator {
+  position: fixed;
+  left: 45px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  display: flex;
+  gap: 20px;
+  pointer-events: auto;
+  user-select: none;
+}
+
+/* Line Container & Progress Lines */
+.navigator-line-container {
+  position: relative;
+  width: 2px;
+  height: 320px; /* Vertical span of navigator */
+}
+
+.navigator-line-bg {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 1px;
+}
+
+.navigator-line-fill {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(to bottom, var(--primary-glow), var(--secondary-glow));
+  box-shadow: 0 0 10px var(--primary-glow);
+  border-radius: 1px;
+  transition: height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: calc(100% - 20px);
+}
+
+/* Navigator steps layout */
+.navigator-items {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 320px;
+  padding: 5px 0;
+}
+
+.navigator-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: none; /* Hide default cursor to match project cursor trail */
+  transition: var(--transition-smooth);
+  opacity: 0.45;
+}
+
+.navigator-item:hover {
+  opacity: 0.9;
+  transform: translateX(4px);
+}
+
+.navigator-item.active {
+  opacity: 1;
+}
+
+.navigator-item.completed {
+  opacity: 0.75;
+}
+
+/* Dots styling */
+.navigator-dot-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 18px;
+  height: 18px;
+  position: relative;
+  left: -29px; /* Align dot exactly centered on the vertical line */
+}
+
+.navigator-dot-outer {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: #05020a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.navigator-dot-inner {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+/* Dot states: Completed (illuminated cyan) / Active (glowing purple pulse) */
+.navigator-item.completed .navigator-dot-outer {
+  border-color: var(--primary-glow);
+  box-shadow: 0 0 8px var(--primary-glow);
+}
+
+.navigator-item.completed .navigator-dot-inner {
+  background: var(--primary-glow);
+}
+
+.navigator-item.active .navigator-dot-outer {
+  border-color: var(--secondary-glow);
+  width: 14px;
+  height: 14px;
+  box-shadow: 0 0 12px var(--secondary-glow);
+}
+
+.navigator-item.active .navigator-dot-inner {
+  background: var(--secondary-glow);
+  width: 6px;
+  height: 6px;
+}
+
+/* Label & Name text */
+.navigator-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.navigator-label {
+  font-family: var(--font-cyber);
+  font-size: 7px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.navigator-name {
+  font-family: var(--font-cyber);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  transition: text-shadow 0.3s ease;
+}
+
+.navigator-item.active .navigator-name {
+  color: #ffffff;
+  text-shadow: 0 0 8px var(--secondary-glow);
+}
+
+.navigator-item.completed .navigator-name {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Hide on small screens for responsiveness */
+@media (max-width: 1024px) {
+  .journey-navigator {
+    display: none;
+  }
+}

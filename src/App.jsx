@@ -6,15 +6,31 @@ import AICitySection from './components/AICitySection';
 import RoboticsLabSection from './components/RoboticsLabSection';
 import QuantumHubSection from './components/QuantumHubSection';
 import InnovationGallerySection from './components/InnovationGallerySection';
+import FinalPortalSection from './components/FinalPortalSection';
+import JourneyNavigator from './components/JourneyNavigator';
+import StatusHUD from './components/StatusHUD';
+import Loader from './components/Loader';
 import CustomCursor from './components/CustomCursor';
 import Modal from './components/Modal';
 import { islands, cubes } from './data/universeData';
+
+const sectorInfo = [
+  { label: 'SECTOR 01', title: 'Space Gateway', subtitle: 'Where the Journey Begins' },
+  { label: 'SECTOR 02', title: 'AI City', subtitle: 'Where Intelligence Comes Alive' },
+  { label: 'SECTOR 03', title: 'Robotics Lab', subtitle: 'Engineering Intelligent Motion' },
+  { label: 'SECTOR 04', title: 'Quantum Hub', subtitle: 'Computing Beyond Binary Limits' },
+  { label: 'SECTOR 05', title: 'Innovation Gallery', subtitle: 'A Vision of Tomorrow' },
+  { label: 'SECTOR 06', title: 'Final Portal', subtitle: 'Step Into the Next Dimension' }
+];
 
 function App() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeIslandId, setActiveIslandId] = useState(null);
   const [activeCubeId, setActiveCubeId] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [overlaySector, setOverlaySector] = useState(null);
 
+  // Monitor scroll progress
   useEffect(() => {
     const handleScroll = () => {
       const docHeight = document.documentElement.scrollHeight;
@@ -29,17 +45,32 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Derive per-section progress (0-1 within each section's scroll range)
-  // scrollProgress: 0.0→0.20 = Hero | 0.20→0.40 = AI City | 0.40→0.60 = Robotics Lab | 0.60→0.80 = Quantum Hub | 0.80→1.0 = Innovation Gallery
-  const heroProgress = Math.min(1, Math.max(0, scrollProgress * 5.0));
-  const cityProgress = Math.min(1, Math.max(0, (scrollProgress - 0.20) * 5.0));
-  const labProgress = Math.min(1, Math.max(0, (scrollProgress - 0.40) * 5.0));
-  const hubProgress = Math.min(1, Math.max(0, (scrollProgress - 0.60) * 5.0));
-  const galleryProgress = Math.min(1, Math.max(0, (scrollProgress - 0.80) * 5.0));
+  // Derive active index (6 segments)
+  const activeIndex = Math.min(5, Math.max(0, Math.floor(scrollProgress * 6.0)));
 
-  // Portal Title: appears near end of hero phase, fades as city phase begins
-  const portalFadeIn = Math.max(0, Math.min(1, (scrollProgress - 0.14) * 15));
-  const portalFadeOut = Math.max(0, Math.min(1, 1 - (scrollProgress - 0.20) * 15));
+  // Trigger temporary section entrance title overlays
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    setOverlaySector(sectorInfo[activeIndex]);
+
+    const timer = setTimeout(() => {
+      setOverlaySector(null);
+    }, 2800);
+
+    return () => clearTimeout(timer);
+  }, [activeIndex, isLoaded]);
+
+  // Derive per-section progress (6 sections)
+  const heroProgress = Math.min(1, Math.max(0, scrollProgress * 6.0));
+  const cityProgress = Math.min(1, Math.max(0, (scrollProgress - 0.1667) * 6.0));
+  const labProgress = Math.min(1, Math.max(0, (scrollProgress - 0.3333) * 6.0));
+  const hubProgress = Math.min(1, Math.max(0, (scrollProgress - 0.50) * 6.0));
+  const galleryProgress = Math.min(1, Math.max(0, (scrollProgress - 0.6667) * 6.0));
+
+  // Portal Title: appears near end of gateway phase, fades as city phase begins
+  const portalFadeIn = Math.max(0, Math.min(1, (scrollProgress - 0.12) * 20));
+  const portalFadeOut = Math.max(0, Math.min(1, 1 - (scrollProgress - 0.1667) * 20));
   const portalTitleOpacity = portalFadeIn * portalFadeOut;
   const portalTitleTranslateY = 20 - portalFadeIn * 20;
 
@@ -48,29 +79,54 @@ function App() {
       {/* Custom Glowing Cursor with Particle Trail */}
       <CustomCursor />
 
-      {/* 3D Interactive WebGL Universe Background */}
-      <Scene scrollProgress={scrollProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} activeCubeId={activeCubeId} setActiveCubeId={setActiveCubeId} />
+      {/* Opening boot loader */}
+      {!isLoaded && <Loader onComplete={() => setIsLoaded(true)} />}
 
-      <div className="fade-in-load">
+      {/* 3D Interactive WebGL Universe Background */}
+      <Scene 
+        scrollProgress={scrollProgress} 
+        activeIslandId={activeIslandId} 
+        setActiveIslandId={setActiveIslandId} 
+        activeCubeId={activeCubeId} 
+        setActiveCubeId={setActiveCubeId} 
+      />
+
+      <div className="fade-in-load" style={{ opacity: isLoaded ? 1 : 0 }}>
         {/* Floating Glassmorphism Navbar */}
         <Navbar />
 
-        {/* HUD Hero Section Layer */}
+        {/* Floating Journey Navigator on the Left */}
+        <JourneyNavigator scrollProgress={scrollProgress} />
+
+        {/* Floating Diagnostics HUD in the Top-Right */}
+        <StatusHUD />
+
+        {/* Space Gateway Section */}
         <HeroSection scrollProgress={heroProgress} />
 
-        {/* AI City Section (scroll-animated 3D city overlay) */}
+        {/* AI City Section */}
         <AICitySection scrollProgress={cityProgress} />
 
-        {/* Robotics Research Lab Section (scroll-animated HTML overlay) */}
+        {/* Robotics Lab Section */}
         <RoboticsLabSection scrollProgress={labProgress} />
 
-        {/* Quantum Innovation Hub Section (scroll-animated HTML overlay) */}
-        <QuantumHubSection scrollProgress={hubProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} />
+        {/* Quantum Innovation Hub Section */}
+        <QuantumHubSection 
+          scrollProgress={hubProgress} 
+          activeIslandId={activeIslandId} 
+          setActiveIslandId={setActiveIslandId} 
+        />
 
-        {/* Innovation Gallery Section (scroll-animated HTML overlay) */}
-        <InnovationGallerySection scrollProgress={galleryProgress} activeCubeId={activeCubeId} />
+        {/* Innovation Gallery Section */}
+        <InnovationGallerySection 
+          scrollProgress={galleryProgress} 
+          activeCubeId={activeCubeId} 
+        />
 
-        {/* Portal Title Overlay (fixed, transitions between sections) */}
+        {/* Final Portal Section */}
+        <FinalPortalSection scrollProgress={scrollProgress} />
+
+        {/* First Portal Title Overlay */}
         <div 
           className="portal-title-overlay"
           style={{
@@ -90,6 +146,17 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* Temporary sector entrance overlays */}
+      {overlaySector && (
+        <div key={overlaySector.title} className="sector-entrance-overlay">
+          <div className="sector-entrance-content">
+            <span className="sector-entrance-label">{overlaySector.label}</span>
+            <h1 className="sector-entrance-title">{overlaySector.title}</h1>
+            <p className="sector-entrance-subtitle">"{overlaySector.subtitle}"</p>
+          </div>
+        </div>
+      )}
 
       {/* Centered Glassmorphism Details Modals */}
       {activeIslandId !== null && (

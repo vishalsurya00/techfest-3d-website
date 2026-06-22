@@ -72,9 +72,11 @@ const QuantumHub = ({ scrollProgress = 0, activeIslandId = null, setActiveIsland
   const isPaused = activeIslandId !== null;
   const timeRef = useRef(0);
 
-  // Sector 4 opacity mapping: fades in from 0.64 to 0.76 (5-section layout)
+  // Sector 4 opacity mapping: fades in starting at 0.50 and out at 0.6667 (6-section layout)
   const hubOpacity = useMemo(() => {
-    return THREE.MathUtils.smoothstep(scrollProgress, 0.64, 0.76);
+    const fadeIn = THREE.MathUtils.smoothstep(scrollProgress, 0.50, 0.54);
+    const fadeOut = 1 - THREE.MathUtils.smoothstep(scrollProgress, 0.62, 0.6667);
+    return fadeIn * fadeOut;
   }, [scrollProgress]);
 
   // Update dynamic orbit positions of the islands

@@ -167,10 +167,10 @@ const RoboticsLab = ({ scrollProgress = 0 }) => {
   // - Fades in between 0.40 and 0.48
   // - Fades out between 0.60 and 0.74
   const labOpacity = useMemo(() => {
-    if (scrollProgress < 0.60) {
-      return THREE.MathUtils.smoothstep(scrollProgress, 0.40, 0.48);
+    if (scrollProgress < 0.45) {
+      return THREE.MathUtils.smoothstep(scrollProgress, 0.3333, 0.38);
     } else {
-      return 1.0 - THREE.MathUtils.smoothstep(scrollProgress, 0.60, 0.74);
+      return 1.0 - THREE.MathUtils.smoothstep(scrollProgress, 0.45, 0.50);
     }
   }, [scrollProgress]);
 
