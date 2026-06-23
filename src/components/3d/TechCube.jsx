@@ -162,7 +162,7 @@ const TechCube = ({
           <meshStandardMaterial
             color={color}
             emissive={color}
-            emissiveIntensity={1.2}
+            emissiveIntensity={2.2}
             roughness={0.15}
             metalness={0.85}
             transparent
@@ -177,7 +177,7 @@ const TechCube = ({
             color={color}
             wireframe
             transparent
-            opacity={galleryOpacity * 0.35}
+            opacity={galleryOpacity * 0.6}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
           />

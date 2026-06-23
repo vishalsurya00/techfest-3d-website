@@ -13,8 +13,8 @@
   justify-content: center;
   align-items: center;
   z-index: 5000;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   padding: 24px;
   animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -22,8 +22,8 @@
 .portal-modal-content {
   position: relative;
   background: rgba(10, 5, 20, 0.68);
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(4px) saturate(180%);
+  -webkit-backdrop-filter: blur(4px) saturate(180%);
   border-radius: 20px;
   width: 650px;
   max-width: 100%;
@@ -259,7 +259,7 @@
   }
   to {
     opacity: 1;
-    backdrop-filter: blur(14px);
+    backdrop-filter: blur(4px);
   }
 }
 

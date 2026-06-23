@@ -40,7 +40,7 @@ const Terminal = ({
     }
 
     // 3. Smoothly lerp glow intensity
-    const targetGlow = hovered ? 2.5 : (isActive ? 1.8 : 1.0);
+    const targetGlow = hovered ? 3.5 : (isActive ? 2.6 : 1.25);
     glowFactor.current = THREE.MathUtils.lerp(glowFactor.current, targetGlow, delta * 5.0);
     if (matRef.current) {
       matRef.current.emissiveIntensity = glowFactor.current;
@@ -105,7 +105,7 @@ const Terminal = ({
           ref={matRef}
           color={color}
           emissive={color}
-          emissiveIntensity={1.0}
+          emissiveIntensity={1.25}
           roughness={0.15}
           metalness={0.9}
           transparent

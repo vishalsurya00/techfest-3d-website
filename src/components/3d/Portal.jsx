@@ -15,8 +15,7 @@ const Portal = ({ scrollProgress = 0, position = [0, 0, -6.0], isFinal = false, 
   // 1. Calculate portal opacity dynamically based on whether it is the final portal or first portal
   const portalOpacity = useMemo(() => {
     if (isFinal) {
-      const finalPhase = Math.min(1, Math.max(0, (scrollProgress - 0.833) * 6.0));
-      return THREE.MathUtils.smoothstep(finalPhase, 0.0, 0.45);
+      return THREE.MathUtils.smoothstep(scrollProgress, 0.73, 0.8333);
     } else {
       const appear = THREE.MathUtils.smoothstep(scrollProgress, 0.04, 0.12);
       const fadeOut = 1 - THREE.MathUtils.smoothstep(scrollProgress, 0.167, 0.23);

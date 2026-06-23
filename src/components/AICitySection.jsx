@@ -2,9 +2,9 @@ import React from 'react';
 import FloatingCard from './FloatingCard';
 import './AICitySection.css';
 
-const AICitySection = ({ scrollProgress = 0 }) => {
+const AICitySection = ({ scrollProgress = 0, isTransitionActive = false }) => {
   // Heading fade-in + slide-up animation
-  const headingOpacity = Math.min(1, Math.max(0, scrollProgress * 3.5));
+  const headingOpacity = isTransitionActive ? 0 : Math.min(1, Math.max(0, scrollProgress * 3.5));
   const headingY = Math.max(0, 50 - scrollProgress * 175);
 
   // Cards staggered fade-in based on scroll

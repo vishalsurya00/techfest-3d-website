@@ -101,7 +101,7 @@ const OrbitNode = ({
           ref={materialRef}
           color={color}
           emissive={color}
-          emissiveIntensity={1.0}
+          emissiveIntensity={2.2}
           roughness={0.15}
           metalness={0.9}
           transparent
@@ -115,7 +115,7 @@ const OrbitNode = ({
         <meshBasicMaterial
           color={color}
           transparent
-          opacity={cityOpacity * 0.55}
+          opacity={cityOpacity * 0.8}
           wireframe
         />
       </mesh>

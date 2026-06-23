@@ -185,8 +185,8 @@ const InnovationGallery = ({ scrollProgress = 0, activeCubeId = null, setActiveC
 
   // Gallery fades in during its scroll phase (6-section layout: 0.6667 to 0.8333)
   const galleryOpacity = useMemo(() => {
-    const fadeIn = THREE.MathUtils.smoothstep(scrollProgress, 0.6667, 0.70);
-    const fadeOut = 1.0 - THREE.MathUtils.smoothstep(scrollProgress, 0.79, 0.8333);
+    const fadeIn = THREE.MathUtils.smoothstep(scrollProgress, 0.56, 0.6667);
+    const fadeOut = 1.0 - THREE.MathUtils.smoothstep(scrollProgress, 0.73, 0.8333);
     return fadeIn * fadeOut;
   }, [scrollProgress]);
 

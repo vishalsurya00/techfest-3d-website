@@ -34,7 +34,8 @@ const SceneContent = ({
   onLoad,
   onWarning,
   failedComponents = [],
-  loadedCounts = {}
+  loadedCounts = {},
+  isTransitionActive = false
 }) => {
   const { camera, scene } = useThree();
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
@@ -170,11 +171,13 @@ const SceneContent = ({
 
     // Calculate parent group Z translation (brings active section to Z ~ 0)
     const sectionZOffsets = [0, 60, 120, 190, 260, 320];
-    const segmentZ = pCurrent * 5.0; // 0 to 5
-    const idxZ = Math.min(4, Math.floor(segmentZ));
+    const segmentZ = pCurrent * 6.0; // 0 to 6 (matches camera mapping)
+    const idxZ = Math.min(5, Math.floor(segmentZ));
     const fracZ = segmentZ - idxZ;
     
-    const groupZOffset = THREE.MathUtils.lerp(sectionZOffsets[idxZ], sectionZOffsets[idxZ + 1], fracZ);
+    const groupZOffset = idxZ >= 5 
+      ? sectionZOffsets[5] 
+      : THREE.MathUtils.lerp(sectionZOffsets[idxZ], sectionZOffsets[idxZ + 1], fracZ);
 
     if (sectionGroupRef.current) {
       sectionGroupRef.current.position.z = groupZOffset;
@@ -330,13 +333,13 @@ const SceneContent = ({
 
   return (
     <>
-      <ambientLight color="#120626" intensity={isDiagLightsEnabled ? 3.0 : 1.8} />
+      <ambientLight color="#120626" intensity={isDiagLightsEnabled ? 3.75 : 2.25} />
       
       {/* Bright solar light (Electric Blue) */}
       <directionalLight
         position={[6, 3, 5]}
         color="#00f0ff"
-        intensity={5.0}
+        intensity={6.25}
         castShadow
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
@@ -346,7 +349,7 @@ const SceneContent = ({
       <directionalLight
         position={[-6, -3, -5]}
         color="#bd00ff"
-        intensity={isDiagLightsEnabled ? 5.0 : 3.2}
+        intensity={isDiagLightsEnabled ? 6.25 : 4.0}
       />
 
       {/* Diagnostic grid helper and test objects */}
@@ -420,14 +423,14 @@ const SceneContent = ({
         <pointLight
           position={[0, 15, -60]}
           color="#00f0ff"
-          intensity={cityProgress * (1.0 - labProgress) * 8}
+          intensity={cityProgress * (1.0 - labProgress) * 10.0}
           distance={80}
           decay={2}
         />
         <pointLight
           position={[0, -5, -60]}
           color="#bd00ff"
-          intensity={cityProgress * (1.0 - labProgress) * 4}
+          intensity={cityProgress * (1.0 - labProgress) * 5.0}
           distance={60}
           decay={2}
         />
@@ -462,9 +465,11 @@ const Scene = ({
   onLoad,
   onWarning,
   failedComponents = [],
-  loadedCounts = {}
+  loadedCounts = {},
+  isTransitionActive = false
 }) => {
   const isModalOpen = activeCubeId !== null || activeIslandId !== null || activeNodeId !== null || activeTerminalId !== null || robotActive;
+  const shouldBlur = isModalOpen || isTransitionActive;
 
   useEffect(() => {
     console.log("Scene Mounted");
@@ -472,7 +477,7 @@ const Scene = ({
   }, [onSceneMount]);
 
   return (
-    <div className={`webgl-canvas ${isModalOpen ? 'gallery-blur scene-interactions-disabled' : ''}`}>
+    <div className={`webgl-canvas ${shouldBlur ? 'gallery-blur' : ''} ${isModalOpen ? 'scene-interactions-disabled' : ''}`}>
       <Canvas
         camera={{ position: [0, 0, 5.8], fov: 45, near: 0.1, far: 2000 }}
         shadows
@@ -507,6 +512,7 @@ const Scene = ({
           onWarning={onWarning}
           failedComponents={failedComponents}
           loadedCounts={loadedCounts}
+          isTransitionActive={isTransitionActive}
         />
       </Canvas>
     </div>

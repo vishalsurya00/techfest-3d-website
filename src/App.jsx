@@ -33,6 +33,8 @@ function App() {
   const [robotActive, setRobotActive] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [overlaySector, setOverlaySector] = useState(null);
+  const [isTransitionActive, setIsTransitionActive] = useState(false);
+  const [prevIndex, setPrevIndex] = useState(0);
 
   // Diagnostic mode states
   const [failedComponents, setFailedComponents] = useState([]);
@@ -124,15 +126,22 @@ function App() {
   // Trigger temporary section entrance title overlays
   useEffect(() => {
     if (!isLoaded) return;
+    if (activeIndex !== prevIndex) {
+      setPrevIndex(activeIndex);
+      setIsTransitionActive(true);
+      setOverlaySector(sectorInfo[activeIndex]);
+    }
+  }, [activeIndex, prevIndex, isLoaded]);
 
-    setOverlaySector(sectorInfo[activeIndex]);
-
-    const timer = setTimeout(() => {
-      setOverlaySector(null);
-    }, 2800);
-
-    return () => clearTimeout(timer);
-  }, [activeIndex, isLoaded]);
+  useEffect(() => {
+    if (isTransitionActive) {
+      const timer = setTimeout(() => {
+        setIsTransitionActive(false);
+        setOverlaySector(null);
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [isTransitionActive]);
 
   // Derive per-section progress (6 sections)
   const heroProgress = Math.min(1, Math.max(0, scrollProgress * 6.0));
@@ -144,7 +153,7 @@ function App() {
   // Portal Title: appears near end of gateway phase, fades as city phase begins
   const portalFadeIn = Math.max(0, Math.min(1, (scrollProgress - 0.12) * 20));
   const portalFadeOut = Math.max(0, Math.min(1, 1 - (scrollProgress - 0.1667) * 20));
-  const portalTitleOpacity = portalFadeIn * portalFadeOut;
+  const portalTitleOpacity = isTransitionActive ? 0 : (portalFadeIn * portalFadeOut);
   const portalTitleTranslateY = 20 - portalFadeIn * 20;
 
   return (
@@ -181,6 +190,7 @@ function App() {
             onWarning={handleWarning}
             failedComponents={failedComponents}
             loadedCounts={loadedCounts}
+            isTransitionActive={isTransitionActive}
           />
         </ErrorBoundary>
       )}
@@ -207,19 +217,19 @@ function App() {
 
         {/* Space Gateway Section */}
         <ErrorBoundary name="HeroSection" onCrash={handleComponentCrash}>
-          <HeroSection scrollProgress={heroProgress} />
+          <HeroSection scrollProgress={heroProgress} isTransitionActive={isTransitionActive && activeIndex === 0} />
         </ErrorBoundary>
 
         {!isAdvancedDisabled && (
           <>
             {/* AI City Section */}
             <ErrorBoundary name="AICitySection" onCrash={handleComponentCrash}>
-              <AICitySection scrollProgress={cityProgress} />
+              <AICitySection scrollProgress={cityProgress} isTransitionActive={isTransitionActive && activeIndex === 1} />
             </ErrorBoundary>
 
             {/* Robotics Lab Section */}
             <ErrorBoundary name="RoboticsLabSection" onCrash={handleComponentCrash}>
-              <RoboticsLabSection scrollProgress={labProgress} />
+              <RoboticsLabSection scrollProgress={labProgress} isTransitionActive={isTransitionActive && activeIndex === 2} />
             </ErrorBoundary>
 
             {/* Quantum Innovation Hub Section */}
@@ -228,6 +238,7 @@ function App() {
                 scrollProgress={hubProgress} 
                 activeIslandId={activeIslandId} 
                 setActiveIslandId={setActiveIslandId} 
+                isTransitionActive={isTransitionActive && activeIndex === 3}
               />
             </ErrorBoundary>
 
@@ -236,12 +247,13 @@ function App() {
               <InnovationGallerySection 
                 scrollProgress={galleryProgress} 
                 activeCubeId={activeCubeId} 
+                isTransitionActive={isTransitionActive && activeIndex === 4}
               />
             </ErrorBoundary>
 
             {/* Final Portal Section */}
             <ErrorBoundary name="FinalPortalSection" onCrash={handleComponentCrash}>
-              <FinalPortalSection scrollProgress={scrollProgress} />
+              <FinalPortalSection scrollProgress={scrollProgress} isTransitionActive={isTransitionActive && activeIndex === 5} />
             </ErrorBoundary>
           </>
         )}
@@ -372,6 +384,12 @@ function App() {
           <span className="debug-label">Section:</span>
           <span className="debug-value">
             {sectorInfo[activeIndex]?.title || 'Space Gateway'}
+          </span>
+        </div>
+        <div className="debug-row">
+          <span className="debug-label">Transition Active:</span>
+          <span className={`debug-value ${isTransitionActive ? 'yes' : 'no'}`}>
+            {isTransitionActive ? 'YES' : 'NO'}
           </span>
         </div>
 

@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './QuantumHubSection.css';
 
-const QuantumHubSection = ({ scrollProgress = 0, activeIslandId, setActiveIslandId }) => {
+const QuantumHubSection = ({ scrollProgress = 0, activeIslandId, setActiveIslandId, isTransitionActive = false }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioCtxRef = useRef(null);
   const mainGainRef = useRef(null);
   const oscsRef = useRef([]);
 
   // Title animations based on scroll progress
-  const headingOpacity = Math.min(1, Math.max(0, scrollProgress * 4.0));
+  const headingOpacity = isTransitionActive ? 0 : Math.min(1, Math.max(0, scrollProgress * 4.0));
   const headingY = Math.max(0, 50 - scrollProgress * 150);
 
   // HUD frame opacity

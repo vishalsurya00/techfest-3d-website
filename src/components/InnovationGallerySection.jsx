@@ -1,9 +1,9 @@
 import React from 'react';
 import './InnovationGallerySection.css';
 
-const InnovationGallerySection = ({ scrollProgress = 0, activeCubeId }) => {
+const InnovationGallerySection = ({ scrollProgress = 0, activeCubeId, isTransitionActive = false }) => {
   // Title animations based on scroll progress
-  const headingOpacity = Math.min(1, Math.max(0, scrollProgress * 4.0));
+  const headingOpacity = isTransitionActive ? 0 : Math.min(1, Math.max(0, scrollProgress * 4.0));
   const headingY = Math.max(0, 50 - scrollProgress * 150);
 
   // HUD frame opacity

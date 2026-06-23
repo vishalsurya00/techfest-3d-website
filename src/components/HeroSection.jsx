@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './HeroSection.css';
 
-const HeroSection = ({ scrollProgress = 0 }) => {
+const HeroSection = ({ scrollProgress = 0, isTransitionActive = false }) => {
   const [coords, setCoords] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -20,7 +20,7 @@ const HeroSection = ({ scrollProgress = 0 }) => {
   }, []);
 
   // Compute scroll-based opacities
-  const centerOpacity = Math.max(0, 1 - scrollProgress * 1.6);
+  const centerOpacity = isTransitionActive ? 0 : Math.max(0, 1 - scrollProgress * 1.6);
   const footerOpacity = Math.max(0, 1 - scrollProgress * 3.8);
   const hudOpacity = Math.max(0, 1 - scrollProgress * 2.2);
 

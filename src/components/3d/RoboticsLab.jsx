@@ -169,10 +169,10 @@ const RoboticsLab = ({ scrollProgress = 0, activeTerminalId = null, setActiveTer
   // - Fades in between 0.40 and 0.48
   // - Fades out between 0.60 and 0.74
   const labOpacity = useMemo(() => {
-    if (scrollProgress < 0.45) {
-      return THREE.MathUtils.smoothstep(scrollProgress, 0.3333, 0.38);
+    if (scrollProgress < 0.41) {
+      return THREE.MathUtils.smoothstep(scrollProgress, 0.22, 0.3333);
     } else {
-      return 1.0 - THREE.MathUtils.smoothstep(scrollProgress, 0.45, 0.50);
+      return 1.0 - THREE.MathUtils.smoothstep(scrollProgress, 0.39, 0.50);
     }
   }, [scrollProgress]);
 
@@ -222,12 +222,12 @@ const RoboticsLab = ({ scrollProgress = 0, activeTerminalId = null, setActiveTer
       <directionalLight
         position={[0, 12, -120]}
         color="#0080ff"
-        intensity={2.8 * labOpacity}
+        intensity={3.5 * labOpacity}
       />
       <pointLight
         position={[0, 5, -120]}
         color="#00ffff"
-        intensity={4.0 * labOpacity}
+        intensity={5.0 * labOpacity}
         distance={35}
         decay={2}
       />

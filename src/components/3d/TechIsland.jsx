@@ -116,7 +116,7 @@ const TechIsland = ({
           <meshBasicMaterial
             color={color}
             transparent
-            opacity={hubOpacity * 0.5}
+            opacity={hubOpacity * 0.85}
             blending={THREE.AdditiveBlending}
           />
         </mesh>
@@ -127,7 +127,7 @@ const TechIsland = ({
           <meshStandardMaterial
             color={color}
             emissive={color}
-            emissiveIntensity={1.2}
+            emissiveIntensity={2.2}
             roughness={0.1}
             metalness={0.9}
             transparent

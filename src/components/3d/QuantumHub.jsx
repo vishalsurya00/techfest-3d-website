@@ -78,8 +78,8 @@ const QuantumHub = ({ scrollProgress = 0, activeIslandId = null, setActiveIsland
 
   // Sector 4 opacity mapping: fades in starting at 0.50 and out at 0.6667 (6-section layout)
   const hubOpacity = useMemo(() => {
-    const fadeIn = THREE.MathUtils.smoothstep(scrollProgress, 0.50, 0.54);
-    const fadeOut = 1 - THREE.MathUtils.smoothstep(scrollProgress, 0.62, 0.6667);
+    const fadeIn = THREE.MathUtils.smoothstep(scrollProgress, 0.39, 0.50);
+    const fadeOut = 1 - THREE.MathUtils.smoothstep(scrollProgress, 0.56, 0.6667);
     return fadeIn * fadeOut;
   }, [scrollProgress]);
 

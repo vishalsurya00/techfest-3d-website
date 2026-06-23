@@ -14,8 +14,8 @@ const AICity = ({ scrollProgress = 0, activeNodeId = null, setActiveNodeId, onLo
   }, [onLoad]);
   // 1. Calculate opacity fade-in and fade-out based on scroll progress
   const cityOpacity = useMemo(() => {
-    const fadeIn = THREE.MathUtils.smoothstep(scrollProgress, 0.1667, 0.20);
-    const fadeOut = 1.0 - THREE.MathUtils.smoothstep(scrollProgress, 0.28, 0.3333);
+    const fadeIn = THREE.MathUtils.smoothstep(scrollProgress, 0.08, 0.1667);
+    const fadeOut = 1.0 - THREE.MathUtils.smoothstep(scrollProgress, 0.22, 0.3333);
     return fadeIn * fadeOut;
   }, [scrollProgress]);
 

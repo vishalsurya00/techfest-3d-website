@@ -1,11 +1,11 @@
 import React from 'react';
 import './FinalPortalSection.css';
 
-const FinalPortalSection = ({ scrollProgress = 0 }) => {
+const FinalPortalSection = ({ scrollProgress = 0, isTransitionActive = false }) => {
   // Final Portal starts at 0.833 of scrollProgress (5/6)
   const portalProgress = Math.min(1, Math.max(0, (scrollProgress - 0.833) * 6.0));
   
-  const headingOpacity = Math.min(1, Math.max(0, portalProgress * 4.0));
+  const headingOpacity = isTransitionActive ? 0 : Math.min(1, Math.max(0, portalProgress * 4.0));
   const headingY = Math.max(0, 50 - portalProgress * 150);
   const hudOpacity = Math.min(1, Math.max(0, (portalProgress - 0.05) * 5.0));
   const instructionOpacity = Math.min(1, Math.max(0, (portalProgress - 0.35) * 3.0));

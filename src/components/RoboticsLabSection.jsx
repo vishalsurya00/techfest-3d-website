@@ -1,10 +1,10 @@
 import React from 'react';
 import './RoboticsLabSection.css';
 
-const RoboticsLabSection = ({ scrollProgress = 0 }) => {
+const RoboticsLabSection = ({ scrollProgress = 0, isTransitionActive = false }) => {
   // Heading fade-in + slide-up animation
   // Enters between progress 0.1 and 0.4, fades out near end of page scroll
-  const headingOpacity = Math.min(1, Math.max(0, scrollProgress * 4.0)) * (1.0 - Math.max(0, (scrollProgress - 0.82) * 5.5));
+  const headingOpacity = isTransitionActive ? 0 : Math.min(1, Math.max(0, scrollProgress * 4.0)) * (1.0 - Math.max(0, (scrollProgress - 0.82) * 5.5));
   const headingY = Math.max(0, 50 - scrollProgress * 150);
 
   // HUD frame opacity

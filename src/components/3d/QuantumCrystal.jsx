@@ -85,14 +85,14 @@ const QuantumCrystal = ({ hubOpacity = 1.0, isPaused = false }) => {
       <pointLight
         position={[0, 0, 0]}
         color="#bd00ff"
-        intensity={6.0 * hubOpacity}
+        intensity={7.5 * hubOpacity}
         distance={18}
         decay={1.8}
       />
       <pointLight
         position={[0, 0, 0]}
         color="#00f0ff"
-        intensity={4.0 * hubOpacity}
+        intensity={5.0 * hubOpacity}
         distance={12}
         decay={2.0}
       />
@@ -106,7 +106,7 @@ const QuantumCrystal = ({ hubOpacity = 1.0, isPaused = false }) => {
           <meshStandardMaterial
             color="#bd00ff"
             emissive="#bd00ff"
-            emissiveIntensity={1.8}
+            emissiveIntensity={2.25}
             roughness={0.1}
             metalness={0.9}
             transparent
@@ -120,7 +120,7 @@ const QuantumCrystal = ({ hubOpacity = 1.0, isPaused = false }) => {
           <meshStandardMaterial
             color="#00f0ff"
             emissive="#00f0ff"
-            emissiveIntensity={1.6}
+            emissiveIntensity={2.0}
             roughness={0.1}
             metalness={0.9}
             transparent
@@ -134,7 +134,7 @@ const QuantumCrystal = ({ hubOpacity = 1.0, isPaused = false }) => {
           <meshStandardMaterial
             color="#ff007a"
             emissive="#ff007a"
-            emissiveIntensity={1.4}
+            emissiveIntensity={1.75}
             roughness={0.1}
             metalness={0.9}
             transparent
@@ -177,7 +177,7 @@ const QuantumCrystal = ({ hubOpacity = 1.0, isPaused = false }) => {
             <meshStandardMaterial
               color={idx % 2 === 0 ? '#00f0ff' : '#bd00ff'}
               emissive={idx % 2 === 0 ? '#00f0ff' : '#bd00ff'}
-              emissiveIntensity={1.2}
+              emissiveIntensity={1.5}
               roughness={0.2}
               metalness={0.8}
               transparent
