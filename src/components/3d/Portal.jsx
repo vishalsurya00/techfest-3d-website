@@ -2,10 +2,11 @@ import React, { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const Portal = ({ scrollProgress = 0, position = [0, 0, -6.0], isFinal = false }) => {
+const Portal = ({ scrollProgress = 0, position = [0, 0, -6.0], isFinal = false, onLoad, onWarning }) => {
   useEffect(() => {
     console.log("Portal Loaded");
-  }, []);
+    if (onLoad) onLoad('portal');
+  }, [onLoad]);
   const portalRef = useRef();
   const discRef = useRef();
   const pointsRef = useRef();
@@ -24,59 +25,64 @@ const Portal = ({ scrollProgress = 0, position = [0, 0, -6.0], isFinal = false }
   }, [scrollProgress, isFinal]);
 
   // 2. Swirling energy disc ShaderMaterial
-  const portalShader = useMemo(() => {
-    return new THREE.ShaderMaterial({
-      transparent: true,
-      side: THREE.DoubleSide,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      uniforms: {
-        uTime: { value: 0 },
-        uOpacity: { value: 0 },
-      },
-      vertexShader: `
-        varying vec2 vUv;
-        void main() {
-          vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform float uTime;
-        uniform float uOpacity;
-        varying vec2 vUv;
+  const [portalShader, shaderError] = useMemo(() => {
+    try {
+      const mat = new THREE.ShaderMaterial({
+        transparent: true,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        uniforms: {
+          uTime: { value: 0 },
+          uOpacity: { value: 0 },
+        },
+        vertexShader: `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform float uTime;
+          uniform float uOpacity;
+          varying vec2 vUv;
 
-        void main() {
-          // Convert UV to centered coordinates (-0.5 to 0.5)
-          vec2 uv = vUv - vec2(0.5);
-          float r = length(uv);
-          float theta = atan(uv.y, uv.x);
+          void main() {
+            // Convert UV to centered coordinates (-0.5 to 0.5)
+            vec2 uv = vUv - vec2(0.5);
+            float r = length(uv);
+            float theta = atan(uv.y, uv.x);
 
-          // Hard radial cutoff at disc boundary
-          if (r > 0.5) discard;
+            // Hard radial cutoff at disc boundary
+            if (r > 0.5) discard;
 
-          // Double spiral arm vortex energy swirl
-          float swirl = theta - r * 12.0 + uTime * 3.5;
-          float pattern = sin(swirl * 2.0) * 0.5 + 0.5;
+            // Double spiral arm vortex energy swirl
+            float swirl = theta - r * 12.0 + uTime * 3.5;
+            float pattern = sin(swirl * 2.0) * 0.5 + 0.5;
 
-          // Radial brightness profile: hot bright core
-          float core = smoothstep(0.5, 0.0, r);
+            // Radial brightness profile: hot bright core
+            float core = smoothstep(0.5, 0.0, r);
 
-          // Neon color palette interpolation
-          vec3 cyan = vec3(0.0, 0.94, 1.0);
-          vec3 purple = vec3(0.74, 0.0, 1.0);
-          vec3 color = mix(purple, cyan, pattern);
+            // Neon color palette interpolation
+            vec3 cyan = vec3(0.0, 0.94, 1.0);
+            vec3 purple = vec3(0.74, 0.0, 1.0);
+            vec3 color = mix(purple, cyan, pattern);
 
-          // Add intensive white glowing core
-          color += vec3(0.8, 0.9, 1.0) * pow(core, 4.0) * 1.8;
+            // Add intensive white glowing core
+            color += vec3(0.8, 0.9, 1.0) * pow(core, 4.0) * 1.8;
 
-          // Fade out towards the outer edges
-          float alpha = smoothstep(0.5, 0.35, r) * uOpacity;
+            // Fade out towards the outer edges
+            float alpha = smoothstep(0.5, 0.35, r) * uOpacity;
 
-          gl_FragColor = vec4(color, alpha);
-        }
-      `
-    });
+            gl_FragColor = vec4(color, alpha);
+          }
+        `
+      });
+      return [mat, null];
+    } catch (err) {
+      return [null, err];
+    }
   }, []);
 
   // 3. Volumetric particles setup
@@ -105,19 +111,32 @@ const Portal = ({ scrollProgress = 0, position = [0, 0, -6.0], isFinal = false }
     return geo;
   }, [particles]);
 
-  const particleTexture = useMemo(() => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 32;
-    canvas.height = 32;
-    const ctx = canvas.getContext('2d');
-    const grad = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
-    grad.addColorStop(0, 'rgba(0, 240, 255, 1.0)');
-    grad.addColorStop(0.3, 'rgba(189, 0, 255, 0.6)');
-    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 32, 32);
-    return new THREE.CanvasTexture(canvas);
+  const [particleTexture, textureError] = useMemo(() => {
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 32;
+      canvas.height = 32;
+      const ctx = canvas.getContext('2d');
+      const grad = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+      grad.addColorStop(0, 'rgba(0, 240, 255, 1.0)');
+      grad.addColorStop(0.3, 'rgba(189, 0, 255, 0.6)');
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 32, 32);
+      return [new THREE.CanvasTexture(canvas), null];
+    } catch (err) {
+      return [null, err];
+    }
   }, []);
+
+  useEffect(() => {
+    if (shaderError && onWarning) {
+      onWarning(`Portal shader failed: ${shaderError.message}`);
+    }
+    if (textureError && onWarning) {
+      onWarning(`Portal particle texture failed: ${textureError.message}`);
+    }
+  }, [shaderError, textureError, onWarning]);
 
   // 4. Frame animation loop
   useFrame((state) => {

@@ -60,10 +60,11 @@ const HubParticles = ({ count = 1500, opacity = 1.0, isPaused = false }) => {
   );
 };
 
-const QuantumHub = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId }) => {
+const QuantumHub = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId, onLoad, onWarning }) => {
   useEffect(() => {
     console.log("Quantum Hub Loaded");
-  }, []);
+    if (onLoad) onLoad('quantumHub');
+  }, [onLoad]);
   const islandGroupRefs = useRef([
     React.createRef(),
     React.createRef(),

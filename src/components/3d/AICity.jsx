@@ -7,10 +7,11 @@ import EnergyRoad from './EnergyRoad';
 import AICore from './AICore';
 
 
-const AICity = ({ scrollProgress = 0, activeNodeId = null, setActiveNodeId }) => {
+const AICity = ({ scrollProgress = 0, activeNodeId = null, setActiveNodeId, onLoad, onWarning }) => {
   useEffect(() => {
     console.log("AI City Loaded");
-  }, []);
+    if (onLoad) onLoad('aiCity');
+  }, [onLoad]);
   // 1. Calculate opacity fade-in and fade-out based on scroll progress
   const cityOpacity = useMemo(() => {
     const fadeIn = THREE.MathUtils.smoothstep(scrollProgress, 0.1667, 0.20);
@@ -60,68 +61,73 @@ const AICity = ({ scrollProgress = 0, activeNodeId = null, setActiveNodeId }) =>
   // 3. Skyscraper material with procedural window grid shader
   const skyscraperMaterial = (colorHex, blinkPhase) => {
     const color = new THREE.Color(colorHex);
-    return new THREE.ShaderMaterial({
-      transparent: true,
-      uniforms: {
-        uTime: { value: 0 },
-        uColor: { value: color },
-        uOpacity: { value: cityOpacity },
-        uBlinkPhase: { value: blinkPhase },
-      },
-      vertexShader: `
-        varying vec2 vUv;
-        varying vec3 vNormal;
+    try {
+      return new THREE.ShaderMaterial({
+        transparent: true,
+        uniforms: {
+          uTime: { value: 0 },
+          uColor: { value: color },
+          uOpacity: { value: cityOpacity },
+          uBlinkPhase: { value: blinkPhase },
+        },
+        vertexShader: `
+          varying vec2 vUv;
+          varying vec3 vNormal;
 
-        void main() {
-          vUv = uv;
-          vNormal = normalize(normalMatrix * normal);
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform float uTime;
-        uniform vec3 uColor;
-        uniform float uOpacity;
-        uniform float uBlinkPhase;
-        varying vec2 vUv;
-        varying vec3 vNormal;
-
-        void main() {
-          // Dark metallic body color base
-          vec3 baseColor = vec3(0.04, 0.02, 0.08);
-
-          // 1. Draw glowing grid of office windows
-          // Repeat X 6 times, Y based on vertical scaling
-          float gridX = sin(vUv.x * 24.0) * 0.5 + 0.5;
-          float gridY = sin(vUv.y * 36.0) * 0.5 + 0.5;
-          
-          // Step grid to create square window slots
-          float windowMask = step(0.78, gridX) * step(0.78, gridY);
-
-          // Filter windows: top and bottom borders have no windows
-          if (vUv.y > 0.94 || vUv.y < 0.06) {
-            windowMask = 0.0;
+          void main() {
+            vUv = uv;
+            vNormal = normalize(normalMatrix * normal);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
           }
+        `,
+        fragmentShader: `
+          uniform float uTime;
+          uniform vec3 uColor;
+          uniform float uOpacity;
+          uniform float uBlinkPhase;
+          varying vec2 vUv;
+          varying vec3 vNormal;
 
-          // 2. Slow blinking window animations
-          float blink = 0.75 + 0.25 * sin(uTime * 1.5 + uBlinkPhase);
-          vec3 windowColor = uColor * blink;
+          void main() {
+            // Dark metallic body color base
+            vec3 baseColor = vec3(0.04, 0.02, 0.08);
 
-          // 3. Highlight side trims (structural neon stripes)
-          float edgeStripe = step(0.97, vUv.x) + step(vUv.x, 0.03);
-          vec3 trimColor = uColor * 1.3;
+            // 1. Draw glowing grid of office windows
+            // Repeat X 6 times, Y based on vertical scaling
+            float gridX = sin(vUv.x * 24.0) * 0.5 + 0.5;
+            float gridY = sin(vUv.y * 36.0) * 0.5 + 0.5;
+            
+            // Step grid to create square window slots
+            float windowMask = step(0.78, gridX) * step(0.78, gridY);
 
-          // Mix base building color with neon windows and side stripes
-          vec3 finalColor = mix(baseColor, windowColor, windowMask * 0.55);
-          finalColor = mix(finalColor, trimColor, edgeStripe * 0.7);
+            // Filter windows: top and bottom borders have no windows
+            if (vUv.y > 0.94 || vUv.y < 0.06) {
+              windowMask = 0.0;
+            }
 
-          // 4. Subtle lighting height-based gradient fade
-          finalColor *= (0.4 + vUv.y * 0.6);
+            // 2. Slow blinking window animations
+            float blink = 0.75 + 0.25 * sin(uTime * 1.5 + uBlinkPhase);
+            vec3 windowColor = uColor * blink;
 
-          gl_FragColor = vec4(finalColor, uOpacity);
-        }
-      `
-    });
+            // 3. Highlight side trims (structural neon stripes)
+            float edgeStripe = step(0.97, vUv.x) + step(vUv.x, 0.03);
+            vec3 trimColor = uColor * 1.3;
+
+            // Mix base building color with neon windows and side stripes
+            vec3 finalColor = mix(baseColor, windowColor, windowMask * 0.55);
+            finalColor = mix(finalColor, trimColor, edgeStripe * 0.7);
+
+            // 4. Subtle lighting height-based gradient fade
+            finalColor *= (0.4 + vUv.y * 0.6);
+
+            gl_FragColor = vec4(finalColor, uOpacity);
+          }
+        `
+      });
+    } catch (err) {
+      if (onWarning) onWarning(`Skyscraper shader failed: ${err.message}`);
+      return new THREE.MeshBasicMaterial({ color, transparent: true, opacity: cityOpacity });
+    }
   };
 
   // Update uTime in materials (sharing a hook is easier, but standard update works)

@@ -157,10 +157,11 @@ const RoboticArm = ({ position = [0, 0, 0], angleOffset = 0, side = 1, labOpacit
 };
 
 // Main RoboticsLab Component
-const RoboticsLab = ({ scrollProgress = 0, activeTerminalId = null, setActiveTerminalId, robotActive = false, setRobotActive }) => {
+const RoboticsLab = ({ scrollProgress = 0, activeTerminalId = null, setActiveTerminalId, robotActive = false, setRobotActive, onLoad, onWarning }) => {
   useEffect(() => {
     console.log("Robotics Lab Loaded");
-  }, []);
+    if (onLoad) onLoad('robotics');
+  }, [onLoad]);
   const conveyorBoxRef = useRef([]);
   const warningLightRef = useRef();
 

@@ -41,9 +41,37 @@ function App() {
   const [is3DDisabled, setIs3DDisabled] = useState(false);
   const [isAdvancedDisabled, setIsAdvancedDisabled] = useState(false);
 
+  // New diagnostic states
+  const [isCameraAnimDisabled, setIsCameraAnimDisabled] = useState(false);
+  const [isDiagLightsEnabled, setIsDiagLightsEnabled] = useState(false);
+  const [isShowTestObjects, setIsShowTestObjects] = useState(false);
+  const [cameraResetTrigger, setCameraResetTrigger] = useState(0);
+  const [loadedCounts, setLoadedCounts] = useState({
+    earth: 0,
+    portal: 0,
+    aiCity: 0,
+    robotics: 0,
+    quantumHub: 0,
+    innovationGallery: 0
+  });
+  const [warnings, setWarnings] = useState([]);
+
   // Error Boundary callback
   const handleComponentCrash = useCallback((name) => {
     setFailedComponents((prev) => prev.includes(name) ? prev : [...prev, name]);
+  }, []);
+
+  // Object load callback
+  const handleObjectLoad = useCallback((name) => {
+    setLoadedCounts((prev) => ({
+      ...prev,
+      [name]: (prev[name] || 0) + 1
+    }));
+  }, []);
+
+  // Warning callback
+  const handleWarning = useCallback((msg) => {
+    setWarnings((prev) => prev.includes(msg) ? prev : [...prev, msg]);
   }, []);
 
   // Log App Mounted
@@ -145,6 +173,12 @@ function App() {
             onSceneMount={() => setIsSceneMounted(true)}
             onCanvasCreated={() => setIsCanvasCreated(true)}
             onCrash={handleComponentCrash}
+            isCameraAnimDisabled={isCameraAnimDisabled}
+            isDiagLightsEnabled={isDiagLightsEnabled}
+            isShowTestObjects={isShowTestObjects}
+            cameraResetTrigger={cameraResetTrigger}
+            onLoad={handleObjectLoad}
+            onWarning={handleWarning}
           />
         </ErrorBoundary>
       )}
@@ -339,6 +373,31 @@ function App() {
           </span>
         </div>
 
+        <div className="debug-row">
+          <span className="debug-label">Earth Loaded:</span>
+          <span className="debug-value">{loadedCounts.earth}</span>
+        </div>
+        <div className="debug-row">
+          <span className="debug-label">Portal Loaded:</span>
+          <span className="debug-value">{loadedCounts.portal}</span>
+        </div>
+        <div className="debug-row">
+          <span className="debug-label">AI City Loaded:</span>
+          <span className="debug-value">{loadedCounts.aiCity}</span>
+        </div>
+        <div className="debug-row">
+          <span className="debug-label">Robotics Loaded:</span>
+          <span className="debug-value">{loadedCounts.robotics}</span>
+        </div>
+        <div className="debug-row">
+          <span className="debug-label">Quantum Hub Loaded:</span>
+          <span className="debug-value">{loadedCounts.quantumHub}</span>
+        </div>
+        <div className="debug-row">
+          <span className="debug-label">Innovation Gallery Loaded:</span>
+          <span className="debug-value">{loadedCounts.innovationGallery}</span>
+        </div>
+
         {failedComponents.length > 0 && (
           <div className="debug-failures">
             <div className="debug-failures-title">FAILED COMPONENTS:</div>
@@ -350,7 +409,42 @@ function App() {
           </div>
         )}
 
+        {warnings.length > 0 && (
+          <div className="debug-warnings">
+            <div className="debug-warnings-title">WARNINGS:</div>
+            <ul className="debug-warnings-list">
+              {warnings.map((warn, index) => (
+                <li key={index}>• {warn}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <div className="debug-buttons">
+          <button 
+            className="debug-btn"
+            onClick={() => setCameraResetTrigger((prev) => prev + 1)}
+          >
+            Reset Camera
+          </button>
+          <button 
+            className={`debug-btn ${isCameraAnimDisabled ? 'active' : ''}`}
+            onClick={() => setIsCameraAnimDisabled((prev) => !prev)}
+          >
+            {isCameraAnimDisabled ? 'Enable Camera Anim' : 'Disable Camera Anim'}
+          </button>
+          <button 
+            className={`debug-btn ${isDiagLightsEnabled ? 'active' : ''}`}
+            onClick={() => setIsDiagLightsEnabled((prev) => !prev)}
+          >
+            {isDiagLightsEnabled ? 'Disable Diag Lights' : 'Enable Diag Lights'}
+          </button>
+          <button 
+            className={`debug-btn ${isShowTestObjects ? 'active' : ''}`}
+            onClick={() => setIsShowTestObjects((prev) => !prev)}
+          >
+            {isShowTestObjects ? 'Hide Test Objects' : 'Show Test Objects'}
+          </button>
           <button 
             className={`debug-btn ${is3DDisabled ? 'active' : ''}`}
             onClick={() => {
