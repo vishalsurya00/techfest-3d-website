@@ -79,6 +79,8 @@
   align-items: center;
   gap: 16px;
   max-width: 900px;
+  max-height: 25vh;
+  overflow: visible;
   will-change: transform;
 }
 
@@ -101,7 +103,7 @@
 
 .hero-title {
   font-family: var(--font-cyber);
-  font-size: clamp(48px, 9vw, 110px);
+  font-size: clamp(3rem, 6vw, 5rem);
   font-weight: 900;
   letter-spacing: 16px;
   color: #fff;
@@ -119,7 +121,7 @@
   width: 100%;
   height: 100%;
   font-family: var(--font-cyber);
-  font-size: clamp(48px, 9vw, 110px);
+  font-size: clamp(3rem, 6vw, 5rem);
   font-weight: 900;
   letter-spacing: 16px;
   color: transparent;

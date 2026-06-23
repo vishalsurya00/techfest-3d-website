@@ -246,7 +246,7 @@ a, button {
 }
 
 .city-title {
-  font-size: clamp(36px, 8vw, 84px);
+  font-size: clamp(3rem, 6vw, 5rem);
   font-weight: 900;
   letter-spacing: 16px;
   color: #ffffff;
@@ -284,7 +284,7 @@ a, button {
 }
 
 .portal-title {
-  font-size: clamp(28px, 6vw, 68px);
+  font-size: clamp(3rem, 6vw, 5rem);
   font-weight: 900;
   letter-spacing: 12px;
   color: #ffffff;
@@ -356,7 +356,7 @@ a, button {
 
 .sector-entrance-title {
   font-family: var(--font-cyber);
-  font-size: clamp(32px, 8vw, 80px);
+  font-size: clamp(3rem, 6vw, 5rem);
   font-weight: 900;
   letter-spacing: 16px;
   color: #ffffff;
@@ -545,5 +545,35 @@ a, button {
   color: #ffdb4a;
   max-height: 80px;
   overflow-y: auto;
+}
+
+/* =====================================================
+   RESPONSIVE HEADING OVERRIDES
+   ===================================================== */
+@media (max-width: 768px) {
+  .hero-title,
+  .hero-title-glow-layer {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .city-title,
+  .portal-title,
+  .sector-entrance-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title,
+  .hero-title-glow-layer {
+    font-size: clamp(2rem, 4vw, 3rem);
+  }
+
+  .city-title,
+  .portal-title,
+  .sector-entrance-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: 8px;
+  }
 }
 

@@ -22,6 +22,8 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  max-height: 25vh;
+  overflow: visible;
   will-change: transform, opacity;
   pointer-events: auto;
 }
@@ -44,7 +46,7 @@
 
 .quantum-hub-title {
   font-family: var(--font-cyber);
-  font-size: clamp(40px, 8.5vw, 92px);
+  font-size: clamp(3rem, 6vw, 5rem);
   font-weight: 900;
   letter-spacing: 12px;
   color: #ffffff;
@@ -154,8 +156,15 @@
 }
 
 /* ---- Responsive ---- */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .quantum-hub-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .quantum-hub-title {
+    font-size: clamp(2rem, 4vw, 3rem);
     letter-spacing: 6px;
   }
 

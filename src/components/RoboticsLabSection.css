@@ -12,7 +12,7 @@
   align-items: center;
   z-index: 50;
   padding: 0 24px;
-  gap: 52px;
+  gap: 64px;
   pointer-events: none; /* Let clicks pass to 3D canvas */
 }
 
@@ -23,6 +23,8 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  max-height: 25vh;
+  overflow: visible;
   will-change: transform, opacity;
   pointer-events: auto;
 }
@@ -45,7 +47,7 @@
 
 .robotics-lab-title {
   font-family: var(--font-cyber);
-  font-size: clamp(44px, 9vw, 100px);
+  font-size: clamp(3rem, 6vw, 5rem);
   font-weight: 900;
   letter-spacing: 16px;
   color: #ffffff;
@@ -99,8 +101,15 @@
 }
 
 /* ---- Responsive ---- */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .robotics-lab-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .robotics-lab-title {
+    font-size: clamp(2rem, 4vw, 3rem);
     letter-spacing: 8px;
   }
 
