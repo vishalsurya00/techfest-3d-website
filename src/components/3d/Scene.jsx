@@ -12,7 +12,7 @@ import QuantumHub from './QuantumHub';
 import InnovationGallery from './InnovationGallery';
 
 // Inner component to access R3F hooks (useFrame, useThree)
-const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId, activeCubeId = null, setActiveCubeId }) => {
+const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId, activeCubeId = null, setActiveCubeId, activeNodeId = null, setActiveNodeId, activeTerminalId = null, setActiveTerminalId, robotActive = false, setRobotActive }) => {
   const { camera, scene } = useThree();
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
@@ -42,7 +42,7 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
 
   useFrame((state, delta) => {
     // 0. Update custom time tracking (freezes when active item is selected)
-    const isPaused = activeIslandId !== null || activeCubeId !== null;
+    const isPaused = activeIslandId !== null || activeCubeId !== null || activeNodeId !== null || activeTerminalId !== null || robotActive;
     const isZoomed = isPaused;
     if (!isPaused) {
       timeRef.current += delta;
@@ -197,6 +197,26 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
       // Slightly zoom toward the selected cube
       zoomCamPos.set(cubeX * 0.62, cubeY + 1.2, cubeZ + 4.0);
       zoomLookAt.set(cubeX, cubeY, cubeZ);
+    } else if (activeNodeId !== null) {
+      // Zoom toward the AI Core
+      zoomCamPos.set(0, -4.5 + 2.0, -60 + 9.0);
+      zoomLookAt.set(0, -4.5, -60);
+    } else if (activeTerminalId !== null) {
+      // Zoom toward the specific terminal
+      if (activeTerminalId === 0) {
+        zoomCamPos.set(-3.6, -3.4 + 1.2, -116.5 + 4.0);
+        zoomLookAt.set(-3.6, -3.4, -116.5);
+      } else if (activeTerminalId === 1) {
+        zoomCamPos.set(0, -3.4 + 1.2, -115.0 + 4.0);
+        zoomLookAt.set(0, -3.4, -115.0);
+      } else if (activeTerminalId === 2) {
+        zoomCamPos.set(3.6, -3.4 + 1.2, -116.5 + 4.0);
+        zoomLookAt.set(3.6, -3.4, -116.5);
+      }
+    } else if (robotActive) {
+      // Zoom toward the robot
+      zoomCamPos.set(0, -1.8 + 1.5, -120 + 4.8);
+      zoomLookAt.set(0, -1.8 + 0.5, -120);
     }
 
     // 1.6. Interpolate between Scroll Camera and Zoom Camera (with ease-in-out)
@@ -283,10 +303,10 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
       <Portal scrollProgress={scrollProgress} position={[0, 0, -320.0]} isFinal={true} />
 
       {/* 3D AI City — uses raw scrollProgress for opacity timing */}
-      <AICity scrollProgress={scrollProgress} />
+      <AICity scrollProgress={scrollProgress} activeNodeId={activeNodeId} setActiveNodeId={setActiveNodeId} />
 
       {/* 3D Robotics Lab — uses raw scrollProgress for transition/fading */}
-      <RoboticsLab scrollProgress={scrollProgress} />
+      <RoboticsLab scrollProgress={scrollProgress} activeTerminalId={activeTerminalId} setActiveTerminalId={setActiveTerminalId} robotActive={robotActive} setRobotActive={setRobotActive} />
 
       {/* 3D Quantum Innovation Hub — uses raw scrollProgress for fading */}
       <QuantumHub scrollProgress={scrollProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} />
@@ -317,9 +337,10 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
   );
 };
 
-const Scene = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId, activeCubeId = null, setActiveCubeId }) => {
+const Scene = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId, activeCubeId = null, setActiveCubeId, activeNodeId = null, setActiveNodeId, activeTerminalId = null, setActiveTerminalId, robotActive = false, setRobotActive }) => {
+  const isModalOpen = activeCubeId !== null || activeIslandId !== null || activeNodeId !== null || activeTerminalId !== null || robotActive;
   return (
-    <div className={`webgl-canvas ${activeCubeId !== null || activeIslandId !== null ? 'gallery-blur' : ''}`}>
+    <div className={`webgl-canvas ${isModalOpen ? 'gallery-blur scene-interactions-disabled' : ''}`}>
       <Canvas
         camera={{ position: [0, 0, 5.8], fov: 45, near: 0.1, far: 2000 }}
         shadows
@@ -330,7 +351,7 @@ const Scene = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId, a
           gl.toneMappingExposure = 1.1;
         }}
       >
-        <SceneContent scrollProgress={scrollProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} activeCubeId={activeCubeId} setActiveCubeId={setActiveCubeId} />
+        <SceneContent scrollProgress={scrollProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} activeCubeId={activeCubeId} setActiveCubeId={setActiveCubeId} activeNodeId={activeNodeId} setActiveNodeId={setActiveNodeId} activeTerminalId={activeTerminalId} setActiveTerminalId={setActiveTerminalId} robotActive={robotActive} setRobotActive={setRobotActive} />
       </Canvas>
     </div>
   );

@@ -1,9 +1,7 @@
-import React, { useMemo, useRef, useState, useEffect } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { Html } from '@react-three/drei';
 import OrbitNode from './OrbitNode';
-import InfoPanel from './InfoPanel';
 
 // Helper to get random point on a sphere of specific radius
 const getRandomPointOnSphere = (radius) => {
@@ -198,12 +196,10 @@ const DriftingParticles = ({ count = 90, cityOpacity }) => {
 };
 
 // Main AICore Component
-const AICore = ({ position = [0, -4.5, -60], cityOpacity = 1.0 }) => {
+const AICore = ({ position = [0, -4.5, -60], cityOpacity = 1.0, activeNodeId = null, setActiveNodeId }) => {
   const coreMeshRef = useRef();
   const cageMeshRef = useRef();
   const pointLightRef = useRef();
-
-  const [activeNodeId, setActiveNodeId] = useState(null);
 
   // 1. Technologies metadata
   const nodeData = useMemo(() => [
@@ -456,15 +452,7 @@ const AICore = ({ position = [0, -4.5, -60], cityOpacity = 1.0 }) => {
         />
       ))}
 
-      {/* 7. Holographic details panel projection (floats 1.8 units above center) */}
-      {activeNodeId !== null && (
-        <Html position={[0, 1.9, 0]} center distanceFactor={14}>
-          <InfoPanel
-            node={nodeData[activeNodeId]}
-            onClose={() => setActiveNodeId(null)}
-          />
-        </Html>
-      )}
+
     </group>
   );
 };

@@ -1,10 +1,8 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { Html } from '@react-three/drei';
 import Robot from './Robot';
 import Terminal from './Terminal';
-import HologramPanel from './HologramPanel';
 import Drone from './Drone';
 
 // Spark / Steam particles near machinery
@@ -159,7 +157,7 @@ const RoboticArm = ({ position = [0, 0, 0], angleOffset = 0, side = 1, labOpacit
 };
 
 // Main RoboticsLab Component
-const RoboticsLab = ({ scrollProgress = 0 }) => {
+const RoboticsLab = ({ scrollProgress = 0, activeTerminalId = null, setActiveTerminalId, robotActive = false, setRobotActive }) => {
   const conveyorBoxRef = useRef([]);
   const warningLightRef = useRef();
 
@@ -174,48 +172,8 @@ const RoboticsLab = ({ scrollProgress = 0 }) => {
     }
   }, [scrollProgress]);
 
-  // Terminal metadata definitions
-  const terminalData = useMemo(() => [
-    {
-      title: 'Autonomous Systems',
-      description: 'Self-correcting vehicular navigation matrices and machine learning sensory interfaces for drone locomotion.',
-      icon: (
-        <svg viewBox="0 0 48 48" fill="none">
-          <circle cx="24" cy="24" r="10" stroke="currentColor" strokeWidth="1.5" />
-          <path d="M24 14V6M24 42v-8M14 24H6M42 24h-8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M8 8l8 8M40 8l-8 8M8 40l8-8M40 40l-8-8" stroke="currentColor" strokeWidth="1" opacity="0.6" />
-        </svg>
-      )
-    },
-    {
-      title: 'Industrial Robots',
-      description: 'Heavy duty multi-axis articulation armatures engineered for micro-millimeter precision welding and assembly.',
-      icon: (
-        <svg viewBox="0 0 48 48" fill="none">
-          <path d="M8 40h32M12 40V24m0 0l16-12 12 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx="28" cy="12" r="3" fill="currentColor" />
-          <rect x="20" y="28" width="8" height="12" rx="1" stroke="currentColor" strokeWidth="1.5" />
-        </svg>
-      )
-    },
-    {
-      title: 'Medical Robotics',
-      description: 'Micro-manipulator teleoperation platforms enabling sub-millimeter surgical accuracy and real-time biometric feedback.',
-      icon: (
-        <svg viewBox="0 0 48 48" fill="none">
-          <path d="M24 8v32M8 24h32" stroke="currentColor" strokeWidth="2.0" strokeLinecap="round" />
-          <rect x="18" y="18" width="12" height="12" rx="2" fill="none" stroke="currentColor" strokeWidth="1.5" />
-          <circle cx="24" cy="24" r="2.5" fill="currentColor" />
-        </svg>
-      )
-    }
-  ], []);
-
   // Track conveyor box positions
   const boxOffsets = [0, 5, 10, 15];
-
-  const [activeTerminalId, setActiveTerminalId] = useState(null);
-  const [robotActive, setRobotActive] = useState(false);
 
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
@@ -424,25 +382,7 @@ const RoboticsLab = ({ scrollProgress = 0 }) => {
         labOpacity={labOpacity}
       />
 
-      {/* 10. Hologram detail panel floating above active terminal */}
-      {activeTerminalId !== null && (
-        <Html
-          position={
-            activeTerminalId === 0
-              ? [-3.6, -2.4, -116.5]
-              : activeTerminalId === 1
-              ? [0, -2.4, -115.0]
-              : [3.6, -2.4, -116.5]
-          }
-          center
-          distanceFactor={12}
-        >
-          <HologramPanel
-            node={terminalData[activeTerminalId]}
-            onClose={() => setActiveTerminalId(null)}
-          />
-        </Html>
-      )}
+
 
     </group>
   );

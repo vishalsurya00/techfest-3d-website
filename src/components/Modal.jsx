@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import './Modal.css';
 
-const Modal = ({ isOpen, onClose, title, description, icon, color = '#00f0ff', futureApps }) => {
+const Modal = ({ isOpen, onClose, title, description, icon, color = '#00f0ff', futureApps, techMeta, children }) => {
   // Listen for Escape key to close modal
   useEffect(() => {
     if (!isOpen) return;
@@ -56,15 +56,19 @@ const Modal = ({ isOpen, onClose, title, description, icon, color = '#00f0ff', f
 
         {/* Modal Header */}
         <div className="modal-header">
-          <div className="modal-icon-wrapper" style={{ color: color }}>
-            {icon}
-          </div>
+          {icon && (
+            <div className="modal-icon-wrapper" style={{ color: color }}>
+              {icon}
+            </div>
+          )}
           <h2 className="modal-title">{title}</h2>
         </div>
 
         {/* Modal Body */}
         <div className="modal-body">
-          <p className="modal-description">{description}</p>
+          {description && (
+            <p className="modal-description">{description}</p>
+          )}
 
           {/* Render Future Applications if they exist (for cubes) */}
           {futureApps && futureApps.length > 0 && (
@@ -80,6 +84,18 @@ const Modal = ({ isOpen, onClose, title, description, icon, color = '#00f0ff', f
               </ul>
             </div>
           )}
+
+          {/* Render Technical Metadata (for AI Core nodes, terminals) */}
+          {techMeta && techMeta.length > 0 && (
+            <div className="modal-tech-meta">
+              {techMeta.map((meta, idx) => (
+                <span key={idx}>{meta}</span>
+              ))}
+            </div>
+          )}
+
+          {/* Custom children content */}
+          {children}
         </div>
       </div>
     </div>

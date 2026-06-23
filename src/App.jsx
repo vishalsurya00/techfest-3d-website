@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Scene from './components/3d/Scene';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
@@ -12,7 +12,7 @@ import StatusHUD from './components/StatusHUD';
 import Loader from './components/Loader';
 import CustomCursor from './components/CustomCursor';
 import Modal from './components/Modal';
-import { islands, cubes } from './data/universeData';
+import { islands, cubes, aiCoreNodes, terminalData, robotInfo } from './data/universeData';
 
 const sectorInfo = [
   { label: 'SECTOR 01', title: 'Space Gateway', subtitle: 'Where the Journey Begins' },
@@ -27,8 +27,20 @@ function App() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeIslandId, setActiveIslandId] = useState(null);
   const [activeCubeId, setActiveCubeId] = useState(null);
+  const [activeNodeId, setActiveNodeId] = useState(null);
+  const [activeTerminalId, setActiveTerminalId] = useState(null);
+  const [robotActive, setRobotActive] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [overlaySector, setOverlaySector] = useState(null);
+
+  // Unified close-all handler
+  const closeAllModals = useCallback(() => {
+    setActiveIslandId(null);
+    setActiveCubeId(null);
+    setActiveNodeId(null);
+    setActiveTerminalId(null);
+    setRobotActive(false);
+  }, []);
 
   // Monitor scroll progress
   useEffect(() => {
@@ -88,7 +100,13 @@ function App() {
         activeIslandId={activeIslandId} 
         setActiveIslandId={setActiveIslandId} 
         activeCubeId={activeCubeId} 
-        setActiveCubeId={setActiveCubeId} 
+        setActiveCubeId={setActiveCubeId}
+        activeNodeId={activeNodeId}
+        setActiveNodeId={setActiveNodeId}
+        activeTerminalId={activeTerminalId}
+        setActiveTerminalId={setActiveTerminalId}
+        robotActive={robotActive}
+        setRobotActive={setRobotActive}
       />
 
       <div className="fade-in-load" style={{ opacity: isLoaded ? 1 : 0 }}>
@@ -178,6 +196,39 @@ function App() {
           icon={cubes[activeCubeId].icon}
           color={cubes[activeCubeId].color}
           futureApps={cubes[activeCubeId].futureApps}
+        />
+      )}
+      {activeNodeId !== null && (
+        <Modal
+          isOpen={activeNodeId !== null}
+          onClose={() => setActiveNodeId(null)}
+          title={aiCoreNodes[activeNodeId].title}
+          description={aiCoreNodes[activeNodeId].description}
+          icon={aiCoreNodes[activeNodeId].icon}
+          color={aiCoreNodes[activeNodeId].color}
+          techMeta={aiCoreNodes[activeNodeId].techMeta}
+        />
+      )}
+      {activeTerminalId !== null && (
+        <Modal
+          isOpen={activeTerminalId !== null}
+          onClose={() => setActiveTerminalId(null)}
+          title={terminalData[activeTerminalId].title}
+          description={terminalData[activeTerminalId].description}
+          icon={terminalData[activeTerminalId].icon}
+          color={terminalData[activeTerminalId].color}
+          techMeta={terminalData[activeTerminalId].techMeta}
+        />
+      )}
+      {robotActive && (
+        <Modal
+          isOpen={robotActive}
+          onClose={() => setRobotActive(false)}
+          title={robotInfo.title}
+          description={robotInfo.description}
+          icon={robotInfo.icon}
+          color={robotInfo.color}
+          techMeta={robotInfo.techMeta}
         />
       )}
     </>

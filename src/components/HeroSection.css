@@ -84,7 +84,7 @@
 
 .hero-tagline {
   font-family: var(--font-cyber);
-  font-size: 11px;
+  font-size: clamp(11px, 1.8vw, 14px);
   font-weight: 700;
   letter-spacing: 6px;
   color: var(--primary-glow);
@@ -134,7 +134,7 @@
 
 .hero-subtitle {
   font-family: var(--font-cyber);
-  font-size: clamp(12px, 2vw, 18px);
+  font-size: clamp(14px, 2.2vw, 20px);
   font-weight: 400;
   letter-spacing: 8px;
   color: var(--text-secondary);

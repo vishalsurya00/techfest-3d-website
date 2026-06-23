@@ -1,43 +1,49 @@
+/* =====================================================
+   UNIVERSAL CENTERED MODAL — Glassmorphism + Neon
+   ===================================================== */
+
 .portal-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(4, 2, 10, 0.75);
+  background: rgba(2, 1, 5, 0.90);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  z-index: 5000;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   padding: 24px;
   animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .portal-modal-content {
   position: relative;
-  background: rgba(10, 5, 20, 0.65);
-  backdrop-filter: blur(25px) saturate(180%);
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  background: rgba(10, 5, 20, 0.68);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
   border-radius: 20px;
-  width: 100%;
-  max-width: 600px;
+  width: 650px;
+  max-width: 100%;
   box-shadow: 
     0 30px 70px rgba(0, 0, 0, 0.6),
-    0 0 35px rgba(0, 240, 255, 0.15),
-    0 0 50px rgba(189, 0, 255, 0.1);
-  padding: 42px 40px;
+    0 0 40px rgba(0, 240, 255, 0.12),
+    0 0 60px rgba(189, 0, 255, 0.08);
+  padding: 48px 44px;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 24px;
   box-sizing: border-box;
   transform-origin: center;
   animation: modalContentScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   pointer-events: auto;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
-/* Gradient Neon Border using pseudo-element */
+/* Neon Gradient Border */
 .portal-modal-content::before {
   content: '';
   position: absolute;
@@ -50,6 +56,18 @@
   z-index: -1;
   pointer-events: none;
   opacity: 0.85;
+}
+
+/* Scrollbar inside modal */
+.portal-modal-content::-webkit-scrollbar {
+  width: 4px;
+}
+.portal-modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.portal-modal-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, var(--secondary-glow), var(--primary-glow));
+  border-radius: 2px;
 }
 
 /* Sci-fi Decorative Accents */
@@ -77,15 +95,21 @@
 .modal-bl { bottom: 8px; left: 8px; border-right: none; border-top: none; border-color: #bd00ff; }
 .modal-br { bottom: 8px; right: 8px; border-left: none; border-top: none; border-color: #00f0ff; }
 
-/* Close Button styling */
+/* ---- Close Button ---- */
 .modal-close-btn {
   position: absolute;
-  top: 20px;
-  right: 24px;
+  top: 18px;
+  right: 22px;
   background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 22px;
   font-weight: 300;
   cursor: none;
   transition: all 0.3s ease;
@@ -94,23 +118,25 @@
 
 .modal-close-btn:hover {
   color: #ffffff;
-  transform: scale(1.15) rotate(90deg);
-  text-shadow: 0 0 8px #fff;
+  border-color: var(--primary-glow);
+  transform: rotate(90deg);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
 }
 
-/* Header */
+/* ---- Header ---- */
 .modal-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
   text-align: center;
+  padding-right: 24px;
 }
 
 .modal-icon-wrapper {
-  width: 64px;
-  height: 64px;
-  filter: drop-shadow(0 0 10px currentColor);
+  width: 72px;
+  height: 72px;
+  filter: drop-shadow(0 0 12px currentColor);
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -120,21 +146,24 @@
 }
 
 .portal-modal-content:hover .modal-icon-wrapper {
-  transform: scale(1.1) rotate(5deg);
+  transform: scale(1.08) rotate(3deg);
 }
 
 .modal-title {
   font-family: var(--font-cyber);
-  font-size: clamp(20px, 3.5vw, 26px);
-  font-weight: 800;
-  letter-spacing: 3px;
+  font-size: clamp(26px, 4.5vw, 36px);
+  font-weight: 900;
+  letter-spacing: 5px;
   color: #ffffff;
   text-transform: uppercase;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+  text-shadow: 
+    0 0 12px rgba(255, 255, 255, 0.15),
+    0 0 20px var(--accent-color, rgba(0, 240, 255, 0.15));
   margin: 0;
+  line-height: 1.2;
 }
 
-/* Body & Typography */
+/* ---- Body & Typography ---- */
 .modal-body {
   display: flex;
   flex-direction: column;
@@ -143,30 +172,31 @@
 
 .modal-description {
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: clamp(16px, 2.2vw, 19px);
   font-weight: 400;
-  line-height: 1.7;
-  color: var(--text-secondary);
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.95);
   text-align: center;
-  margin: 0;
+  margin: 0 0 8px 0;
+  letter-spacing: 0.3px;
 }
 
-/* Future Applications List */
+/* ---- Future Applications List ---- */
 .modal-future-section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   margin-top: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 20px;
+  padding-top: 22px;
 }
 
 .modal-future-label {
   font-family: var(--font-cyber);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 2px;
-  color: var(--text-muted);
+  letter-spacing: 3px;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .modal-future-list {
@@ -175,7 +205,7 @@
   margin: 0;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 10px;
+  gap: 12px;
 }
 
 @media (min-width: 480px) {
@@ -186,22 +216,42 @@
 
 .modal-future-item {
   font-family: var(--font-body);
-  font-size: 13.5px;
-  color: var(--text-secondary);
+  font-size: clamp(14px, 1.8vw, 15px);
+  color: rgba(255, 255, 255, 0.9);
   display: flex;
   align-items: center;
   gap: 10px;
+  line-height: 1.5;
 }
 
 .modal-bullet {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
-  box-shadow: 0 0 6px currentColor;
+  box-shadow: 0 0 8px currentColor;
 }
 
-/* Animations */
+/* ---- Technical Metadata Sub-section (used by AI Core nodes, terminals) ---- */
+.modal-tech-meta {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 4px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.modal-tech-meta span {
+  font-family: var(--font-cyber);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  color: var(--primary-glow);
+  text-shadow: 0 0 6px rgba(0, 240, 255, 0.3);
+}
+
+/* ---- Animations ---- */
 @keyframes modalFadeIn {
   from {
     opacity: 0;
@@ -209,7 +259,7 @@
   }
   to {
     opacity: 1;
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(14px);
   }
 }
 
@@ -221,5 +271,46 @@
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
+  }
+}
+
+/* ---- Responsive: Tablet ---- */
+@media (max-width: 768px) {
+  .portal-modal-content {
+    width: 90%;
+    max-width: 100%;
+    padding: 40px 32px;
+  }
+  .modal-icon-wrapper {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* ---- Responsive: Mobile ---- */
+@media (max-width: 480px) {
+  .portal-modal-overlay {
+    padding: 12px;
+  }
+  .portal-modal-content {
+    width: 95%;
+    max-width: 100%;
+    padding: 32px 20px;
+    gap: 20px;
+  }
+  .modal-header {
+    gap: 14px;
+    padding-right: 16px;
+  }
+  .modal-icon-wrapper {
+    width: 52px;
+    height: 52px;
+  }
+  .modal-close-btn {
+    top: 12px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
   }
 }

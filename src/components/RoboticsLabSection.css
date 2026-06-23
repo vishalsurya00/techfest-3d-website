@@ -29,7 +29,7 @@
 
 .robotics-lab-tagline {
   font-family: var(--font-cyber);
-  font-size: 10px;
+  font-size: clamp(11px, 1.8vw, 14px);
   font-weight: 700;
   letter-spacing: 5px;
   color: #00ffa0;
@@ -45,7 +45,7 @@
 
 .robotics-lab-title {
   font-family: var(--font-cyber);
-  font-size: clamp(38px, 8.5vw, 90px);
+  font-size: clamp(44px, 9vw, 100px);
   font-weight: 900;
   letter-spacing: 16px;
   color: #ffffff;
@@ -59,7 +59,7 @@
 
 .robotics-lab-subtitle {
   font-family: var(--font-cyber);
-  font-size: clamp(11px, 2vw, 15px);
+  font-size: clamp(13px, 2.2vw, 18px);
   font-weight: 400;
   letter-spacing: 6px;
   color: var(--text-secondary);
@@ -88,7 +88,7 @@
   position: absolute;
   bottom: 60px;
   font-family: var(--font-cyber);
-  font-size: 10px;
+  font-size: clamp(11px, 1.8vw, 14px);
   font-weight: 500;
   letter-spacing: 3px;
   color: #00ffa0;

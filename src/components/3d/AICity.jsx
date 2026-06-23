@@ -7,7 +7,7 @@ import EnergyRoad from './EnergyRoad';
 import AICore from './AICore';
 
 
-const AICity = ({ scrollProgress = 0 }) => {
+const AICity = ({ scrollProgress = 0, activeNodeId = null, setActiveNodeId }) => {
   // 1. Calculate opacity fade-in and fade-out based on scroll progress
   const cityOpacity = useMemo(() => {
     const fadeIn = THREE.MathUtils.smoothstep(scrollProgress, 0.1667, 0.20);
@@ -211,7 +211,7 @@ const AICity = ({ scrollProgress = 0 }) => {
       <Hologram position={[5.8, -1.8, -54]} scale={0.9} type="sphere" color="#00f0ff" />
       
       {/* 5. Center Interactive AI Core (Glowing sphere, orbiting nodes, info panels) */}
-      <AICore position={[0, -4.5, -60]} cityOpacity={cityOpacity} />
+      <AICore position={[0, -4.5, -60]} cityOpacity={cityOpacity} activeNodeId={activeNodeId} setActiveNodeId={setActiveNodeId} />
 
       {/* 5. Energy Roads Grid */}
       <EnergyRoad start={[-5.8, -1.0, -66]} end={[5.8, -1.0, -66]} color="#ff007a" />

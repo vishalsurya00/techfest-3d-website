@@ -9,8 +9,8 @@
   --accent-glow: #ff007a; /* Neon Pink/Magenta */
   
   --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.7);
-  --text-muted: rgba(255, 255, 255, 0.4);
+  --text-secondary: rgba(255, 255, 255, 0.88);
+  --text-muted: rgba(255, 255, 255, 0.65);
   
   --font-cyber: 'Orbitron', sans-serif;
   --font-body: 'Inter', sans-serif;
@@ -199,6 +199,10 @@ a, button {
 
 .webgl-canvas.gallery-blur {
   filter: blur(4px) brightness(0.65);
+}
+
+.webgl-canvas.scene-interactions-disabled {
+  pointer-events: none !important;
 }
 
 /* Let clicks pass through default layout wrapper but enable them on child components */

@@ -1,7 +1,6 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { Html } from '@react-three/drei';
 
 const Robot = ({
   position = [0, -1.8, -120],
@@ -79,24 +78,7 @@ const Robot = ({
     }
   });
 
-  // Clicking outside close listener
-  useEffect(() => {
-    if (active) {
-      const handleOutsideClick = () => {
-        onClose();
-      };
-      
-      // Small timeout to prevent closing immediately
-      const timer = setTimeout(() => {
-        document.addEventListener('click', handleOutsideClick);
-      }, 120);
 
-      return () => {
-        clearTimeout(timer);
-        document.removeEventListener('click', handleOutsideClick);
-      };
-    }
-  }, [active, onClose]);
 
   return (
     <group ref={robotGroupRef} position={position}>
@@ -337,87 +319,6 @@ const Robot = ({
         </group>
       )}
 
-      {/* 3. Speech Bubble interface (HTML floating above the robot) */}
-      {active && (
-        <Html position={[0, 1.0, 0]} center distanceFactor={12}>
-          <div
-            className="robot-speech-bubble"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: 'rgba(3, 10, 18, 0.86)',
-              border: '1px solid #00f0ff',
-              borderRadius: '8px',
-              padding: '12px 18px',
-              width: '230px',
-              color: '#ffffff',
-              boxShadow: '0 0 16px rgba(0, 240, 255, 0.45)',
-              position: 'relative',
-              animation: 'speech-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
-              pointerEvents: 'auto',
-            }}
-          >
-            {/* Custom arrow decoration pointing down */}
-            <div
-              style={{
-                position: 'absolute',
-                bottom: '-8px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '0',
-                height: '0',
-                borderLeft: '8px solid transparent',
-                borderRight: '8px solid transparent',
-                borderTop: '8px solid #00f0ff',
-              }}
-            />
-            {/* HUD Bracket Styling */}
-            <div style={{ position: 'absolute', top: '4px', left: '4px', width: '6px', height: '6px', borderLeft: '1px solid #00f0ff', borderTop: '1px solid #00f0ff' }} />
-            <div style={{ position: 'absolute', top: '4px', right: '4px', width: '6px', height: '6px', borderRight: '1px solid #00f0ff', borderTop: '1px solid #00f0ff' }} />
-            
-            <p
-              style={{
-                margin: 0,
-                fontSize: '11px',
-                fontFamily: 'var(--font-cyber)',
-                lineHeight: '1.6',
-                textAlign: 'center',
-                letterSpacing: '1px',
-              }}
-            >
-              "Welcome to the Robotics Research Lab."
-            </p>
-            
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onClose();
-              }}
-              style={{
-                position: 'absolute',
-                top: '2px',
-                right: '6px',
-                background: 'none',
-                border: 'none',
-                color: 'rgba(255,255,255,0.4)',
-                cursor: 'none',
-                fontSize: '14px',
-              }}
-            >
-              &times;
-            </button>
-          </div>
-        </Html>
-      )}
-
-      {/* CSS Animation injection for pop effect */}
-      <Html>
-        <style dangerouslySetInnerHTML={{__html: `
-          @keyframes speech-pop {
-            from { opacity: 0; transform: scale(0.8) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-          }
-        `}} />
-      </Html>
 
     </group>
   );
