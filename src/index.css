@@ -404,3 +404,124 @@ a, button {
     transform: scale(1.05);
   }
 }
+
+/* =====================================================
+   TEMPORARY DIAGNOSTIC DEBUG PANEL
+   ===================================================== */
+.debug-panel {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 10000;
+  background: rgba(10, 5, 20, 0.90);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border: 1px solid #ff007a;
+  border-radius: 12px;
+  padding: 16px;
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(255, 0, 122, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 280px;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.debug-panel-title {
+  font-family: var(--font-cyber);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #ff007a;
+  text-shadow: 0 0 8px rgba(255, 0, 122, 0.5);
+  border-bottom: 1px solid rgba(255, 0, 122, 0.3);
+  padding-bottom: 8px;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.debug-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.debug-label {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.debug-value {
+  font-weight: bold;
+  color: #00f0ff;
+}
+
+.debug-value.yes {
+  color: #00ff66;
+}
+
+.debug-value.no {
+  color: #ff0055;
+}
+
+.debug-failures {
+  margin-top: 4px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.15);
+  padding-top: 8px;
+}
+
+.debug-failures-title {
+  color: #ff0055;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.debug-failures-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: #ff3b30;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.debug-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 10px;
+}
+
+.debug-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #ffffff;
+  padding: 8px;
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.debug-btn:hover {
+  background: rgba(255, 0, 122, 0.15);
+  border-color: #ff007a;
+  color: #ff007a;
+}
+
+.debug-btn.active {
+  background: rgba(0, 240, 255, 0.15);
+  border-color: #00f0ff;
+  color: #00f0ff;
+}
+

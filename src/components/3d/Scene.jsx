@@ -10,9 +10,10 @@ import AICity from './AICity';
 import RoboticsLab from './RoboticsLab';
 import QuantumHub from './QuantumHub';
 import InnovationGallery from './InnovationGallery';
+import ThreeErrorBoundary from './ThreeErrorBoundary';
 
 // Inner component to access R3F hooks (useFrame, useThree)
-const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId, activeCubeId = null, setActiveCubeId, activeNodeId = null, setActiveNodeId, activeTerminalId = null, setActiveTerminalId, robotActive = false, setRobotActive }) => {
+const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId, activeCubeId = null, setActiveCubeId, activeNodeId = null, setActiveNodeId, activeTerminalId = null, setActiveTerminalId, robotActive = false, setRobotActive, onCrash }) => {
   const { camera, scene } = useThree();
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
@@ -261,16 +262,19 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
     tiltedLookAt.y -= mouse.y * 1.2;
     camera.lookAt(tiltedLookAt);
 
-    // 5. Update volumetric fog settings dynamically
     if (scene.fog) {
       scene.fog.color.copy(currentFogColor);
       scene.fog.density = currentFogDensity;
+    }
+
+    const camPosEl = document.getElementById('debug-cam-pos');
+    if (camPosEl) {
+      camPosEl.textContent = `X: ${camera.position.x.toFixed(2)}, Y: ${camera.position.y.toFixed(2)}, Z: ${camera.position.z.toFixed(2)}`;
     }
   });
 
   return (
     <>
-      {/* Sci-Fi Lighting System */}
       <ambientLight color="#120626" intensity={1.8} />
       
       {/* Bright solar light (Electric Blue) */}
@@ -292,27 +296,43 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
 
       {/* Earth Group (contains Earth mesh and the spaceship) — uses heroProgress */}
       <group>
-        <Earth scrollProgress={heroProgress} />
-        <Spaceship scrollProgress={heroProgress} />
+        <ThreeErrorBoundary name="Earth" onCrash={onCrash} position={[-3.8, -0.2, 0]}>
+          <Earth scrollProgress={heroProgress} />
+        </ThreeErrorBoundary>
+        <ThreeErrorBoundary name="Spaceship" onCrash={onCrash}>
+          <Spaceship scrollProgress={heroProgress} />
+        </ThreeErrorBoundary>
       </group>
 
       {/* 3D Glowing Portal — first portal */}
-      <Portal scrollProgress={scrollProgress} position={[0, 0, -6.0]} isFinal={false} />
+      <ThreeErrorBoundary name="Portal 1" onCrash={onCrash} position={[0, 0, -6.0]}>
+        <Portal scrollProgress={scrollProgress} position={[0, 0, -6.0]} isFinal={false} />
+      </ThreeErrorBoundary>
 
       {/* 3D Glowing Portal — second/final portal at Z = -320 */}
-      <Portal scrollProgress={scrollProgress} position={[0, 0, -320.0]} isFinal={true} />
+      <ThreeErrorBoundary name="Portal 2" onCrash={onCrash} position={[0, 0, -320.0]}>
+        <Portal scrollProgress={scrollProgress} position={[0, 0, -320.0]} isFinal={true} />
+      </ThreeErrorBoundary>
 
       {/* 3D AI City — uses raw scrollProgress for opacity timing */}
-      <AICity scrollProgress={scrollProgress} activeNodeId={activeNodeId} setActiveNodeId={setActiveNodeId} />
+      <ThreeErrorBoundary name="AI City" onCrash={onCrash} position={[0, -4.5, -60]}>
+        <AICity scrollProgress={scrollProgress} activeNodeId={activeNodeId} setActiveNodeId={setActiveNodeId} />
+      </ThreeErrorBoundary>
 
       {/* 3D Robotics Lab — uses raw scrollProgress for transition/fading */}
-      <RoboticsLab scrollProgress={scrollProgress} activeTerminalId={activeTerminalId} setActiveTerminalId={setActiveTerminalId} robotActive={robotActive} setRobotActive={setRobotActive} />
+      <ThreeErrorBoundary name="Robotics Lab" onCrash={onCrash} position={[0, -4.8, -120]}>
+        <RoboticsLab scrollProgress={scrollProgress} activeTerminalId={activeTerminalId} setActiveTerminalId={setActiveTerminalId} robotActive={robotActive} setRobotActive={setRobotActive} />
+      </ThreeErrorBoundary>
 
       {/* 3D Quantum Innovation Hub — uses raw scrollProgress for fading */}
-      <QuantumHub scrollProgress={scrollProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} />
+      <ThreeErrorBoundary name="Quantum Hub" onCrash={onCrash} position={[0, 0, -190]}>
+        <QuantumHub scrollProgress={scrollProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} />
+      </ThreeErrorBoundary>
 
       {/* 3D Innovation Gallery — uses raw scrollProgress for fading */}
-      <InnovationGallery scrollProgress={scrollProgress} activeCubeId={activeCubeId} setActiveCubeId={setActiveCubeId} />
+      <ThreeErrorBoundary name="Innovation Gallery" onCrash={onCrash} position={[0, 0, -260]}>
+        <InnovationGallery scrollProgress={scrollProgress} activeCubeId={activeCubeId} setActiveCubeId={setActiveCubeId} />
+      </ThreeErrorBoundary>
 
       {/* Background starfield and nebula — uses raw scrollProgress, computes heroPhase internally */}
       <Starfield scrollProgress={scrollProgress} />
@@ -337,8 +357,14 @@ const SceneContent = ({ scrollProgress = 0, activeIslandId = null, setActiveIsla
   );
 };
 
-const Scene = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId, activeCubeId = null, setActiveCubeId, activeNodeId = null, setActiveNodeId, activeTerminalId = null, setActiveTerminalId, robotActive = false, setRobotActive }) => {
+const Scene = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId, activeCubeId = null, setActiveCubeId, activeNodeId = null, setActiveNodeId, activeTerminalId = null, setActiveTerminalId, robotActive = false, setRobotActive, onSceneMount, onCanvasCreated, onCrash }) => {
   const isModalOpen = activeCubeId !== null || activeIslandId !== null || activeNodeId !== null || activeTerminalId !== null || robotActive;
+
+  useEffect(() => {
+    console.log("Scene Mounted");
+    if (onSceneMount) onSceneMount();
+  }, [onSceneMount]);
+
   return (
     <div className={`webgl-canvas ${isModalOpen ? 'gallery-blur scene-interactions-disabled' : ''}`}>
       <Canvas
@@ -349,9 +375,24 @@ const Scene = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId, a
           scene.fog = new THREE.FogExp2('#05020a', 0.0018);
           gl.toneMapping = THREE.ACESFilmicToneMapping;
           gl.toneMappingExposure = 1.1;
+          console.log("Canvas Created");
+          if (onCanvasCreated) onCanvasCreated();
         }}
       >
-        <SceneContent scrollProgress={scrollProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} activeCubeId={activeCubeId} setActiveCubeId={setActiveCubeId} activeNodeId={activeNodeId} setActiveNodeId={setActiveNodeId} activeTerminalId={activeTerminalId} setActiveTerminalId={setActiveTerminalId} robotActive={robotActive} setRobotActive={setRobotActive} />
+        <SceneContent 
+          scrollProgress={scrollProgress} 
+          activeIslandId={activeIslandId} 
+          setActiveIslandId={setActiveIslandId} 
+          activeCubeId={activeCubeId} 
+          setActiveCubeId={setActiveCubeId} 
+          activeNodeId={activeNodeId} 
+          setActiveNodeId={setActiveNodeId} 
+          activeTerminalId={activeTerminalId} 
+          setActiveTerminalId={setActiveTerminalId} 
+          robotActive={robotActive} 
+          setRobotActive={setRobotActive} 
+          onCrash={onCrash}
+        />
       </Canvas>
     </div>
   );

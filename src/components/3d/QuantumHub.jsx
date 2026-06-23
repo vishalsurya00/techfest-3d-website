@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import QuantumCrystal from './QuantumCrystal';
@@ -61,6 +61,9 @@ const HubParticles = ({ count = 1500, opacity = 1.0, isPaused = false }) => {
 };
 
 const QuantumHub = ({ scrollProgress = 0, activeIslandId = null, setActiveIslandId }) => {
+  useEffect(() => {
+    console.log("Quantum Hub Loaded");
+  }, []);
   const islandGroupRefs = useRef([
     React.createRef(),
     React.createRef(),

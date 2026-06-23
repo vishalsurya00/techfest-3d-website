@@ -1,8 +1,11 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 const Portal = ({ scrollProgress = 0, position = [0, 0, -6.0], isFinal = false }) => {
+  useEffect(() => {
+    console.log("Portal Loaded");
+  }, []);
   const portalRef = useRef();
   const discRef = useRef();
   const pointsRef = useRef();

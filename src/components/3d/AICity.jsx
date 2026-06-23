@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import Drone from './Drone';
@@ -8,6 +8,9 @@ import AICore from './AICore';
 
 
 const AICity = ({ scrollProgress = 0, activeNodeId = null, setActiveNodeId }) => {
+  useEffect(() => {
+    console.log("AI City Loaded");
+  }, []);
   // 1. Calculate opacity fade-in and fade-out based on scroll progress
   const cityOpacity = useMemo(() => {
     const fadeIn = THREE.MathUtils.smoothstep(scrollProgress, 0.1667, 0.20);

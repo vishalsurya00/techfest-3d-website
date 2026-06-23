@@ -12,6 +12,7 @@ import StatusHUD from './components/StatusHUD';
 import Loader from './components/Loader';
 import CustomCursor from './components/CustomCursor';
 import Modal from './components/Modal';
+import ErrorBoundary from './components/ErrorBoundary';
 import { islands, cubes, aiCoreNodes, terminalData, robotInfo } from './data/universeData';
 
 const sectorInfo = [
@@ -32,6 +33,38 @@ function App() {
   const [robotActive, setRobotActive] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [overlaySector, setOverlaySector] = useState(null);
+
+  // Diagnostic mode states
+  const [failedComponents, setFailedComponents] = useState([]);
+  const [isSceneMounted, setIsSceneMounted] = useState(false);
+  const [isCanvasCreated, setIsCanvasCreated] = useState(false);
+  const [is3DDisabled, setIs3DDisabled] = useState(false);
+  const [isAdvancedDisabled, setIsAdvancedDisabled] = useState(false);
+
+  // Error Boundary callback
+  const handleComponentCrash = useCallback((name) => {
+    setFailedComponents((prev) => prev.includes(name) ? prev : [...prev, name]);
+  }, []);
+
+  // Log App Mounted
+  useEffect(() => {
+    console.log("App Mounted");
+  }, []);
+
+  // Monitor Advanced Section Disable scroll behavior
+  useEffect(() => {
+    if (isAdvancedDisabled) {
+      document.body.style.minHeight = '100vh';
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.minHeight = '';
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.minHeight = '';
+      document.body.style.overflow = '';
+    };
+  }, [isAdvancedDisabled]);
 
   // Unified close-all handler
   const closeAllModals = useCallback(() => {
@@ -95,78 +128,113 @@ function App() {
       {!isLoaded && <Loader onComplete={() => setIsLoaded(true)} />}
 
       {/* 3D Interactive WebGL Universe Background */}
-      <Scene 
-        scrollProgress={scrollProgress} 
-        activeIslandId={activeIslandId} 
-        setActiveIslandId={setActiveIslandId} 
-        activeCubeId={activeCubeId} 
-        setActiveCubeId={setActiveCubeId}
-        activeNodeId={activeNodeId}
-        setActiveNodeId={setActiveNodeId}
-        activeTerminalId={activeTerminalId}
-        setActiveTerminalId={setActiveTerminalId}
-        robotActive={robotActive}
-        setRobotActive={setRobotActive}
-      />
+      {!is3DDisabled && (
+        <ErrorBoundary name="Scene" onCrash={handleComponentCrash}>
+          <Scene 
+            scrollProgress={scrollProgress} 
+            activeIslandId={activeIslandId} 
+            setActiveIslandId={setActiveIslandId} 
+            activeCubeId={activeCubeId} 
+            setActiveCubeId={setActiveCubeId}
+            activeNodeId={activeNodeId}
+            setActiveNodeId={setActiveNodeId}
+            activeTerminalId={activeTerminalId}
+            setActiveTerminalId={setActiveTerminalId}
+            robotActive={robotActive}
+            setRobotActive={setRobotActive}
+            onSceneMount={() => setIsSceneMounted(true)}
+            onCanvasCreated={() => setIsCanvasCreated(true)}
+            onCrash={handleComponentCrash}
+          />
+        </ErrorBoundary>
+      )}
 
       <div className="fade-in-load" style={{ opacity: isLoaded ? 1 : 0 }}>
         {/* Floating Glassmorphism Navbar */}
-        <Navbar />
+        <ErrorBoundary name="Navbar" onCrash={handleComponentCrash}>
+          <Navbar />
+        </ErrorBoundary>
 
         {/* Floating Journey Navigator on the Left */}
-        <JourneyNavigator scrollProgress={scrollProgress} />
+        {!isAdvancedDisabled && (
+          <ErrorBoundary name="JourneyNavigator" onCrash={handleComponentCrash}>
+            <JourneyNavigator scrollProgress={scrollProgress} />
+          </ErrorBoundary>
+        )}
 
         {/* Floating Diagnostics HUD in the Top-Right */}
-        <StatusHUD />
+        {!isAdvancedDisabled && (
+          <ErrorBoundary name="StatusHUD" onCrash={handleComponentCrash}>
+            <StatusHUD />
+          </ErrorBoundary>
+        )}
 
         {/* Space Gateway Section */}
-        <HeroSection scrollProgress={heroProgress} />
+        <ErrorBoundary name="HeroSection" onCrash={handleComponentCrash}>
+          <HeroSection scrollProgress={heroProgress} />
+        </ErrorBoundary>
 
-        {/* AI City Section */}
-        <AICitySection scrollProgress={cityProgress} />
+        {!isAdvancedDisabled && (
+          <>
+            {/* AI City Section */}
+            <ErrorBoundary name="AICitySection" onCrash={handleComponentCrash}>
+              <AICitySection scrollProgress={cityProgress} />
+            </ErrorBoundary>
 
-        {/* Robotics Lab Section */}
-        <RoboticsLabSection scrollProgress={labProgress} />
+            {/* Robotics Lab Section */}
+            <ErrorBoundary name="RoboticsLabSection" onCrash={handleComponentCrash}>
+              <RoboticsLabSection scrollProgress={labProgress} />
+            </ErrorBoundary>
 
-        {/* Quantum Innovation Hub Section */}
-        <QuantumHubSection 
-          scrollProgress={hubProgress} 
-          activeIslandId={activeIslandId} 
-          setActiveIslandId={setActiveIslandId} 
-        />
+            {/* Quantum Innovation Hub Section */}
+            <ErrorBoundary name="QuantumHubSection" onCrash={handleComponentCrash}>
+              <QuantumHubSection 
+                scrollProgress={hubProgress} 
+                activeIslandId={activeIslandId} 
+                setActiveIslandId={setActiveIslandId} 
+              />
+            </ErrorBoundary>
 
-        {/* Innovation Gallery Section */}
-        <InnovationGallerySection 
-          scrollProgress={galleryProgress} 
-          activeCubeId={activeCubeId} 
-        />
+            {/* Innovation Gallery Section */}
+            <ErrorBoundary name="InnovationGallerySection" onCrash={handleComponentCrash}>
+              <InnovationGallerySection 
+                scrollProgress={galleryProgress} 
+                activeCubeId={activeCubeId} 
+              />
+            </ErrorBoundary>
 
-        {/* Final Portal Section */}
-        <FinalPortalSection scrollProgress={scrollProgress} />
+            {/* Final Portal Section */}
+            <ErrorBoundary name="FinalPortalSection" onCrash={handleComponentCrash}>
+              <FinalPortalSection scrollProgress={scrollProgress} />
+            </ErrorBoundary>
+          </>
+        )}
 
         {/* First Portal Title Overlay */}
-        <div 
-          className="portal-title-overlay"
-          style={{
-            opacity: portalTitleOpacity,
-            transform: `translate(-50%, calc(-50% + ${portalTitleTranslateY}px))`,
-            pointerEvents: portalTitleOpacity > 0.1 ? 'auto' : 'none'
-          }}
-        >
-          <h1 className="portal-title">ENTER THE AI DIMENSION</h1>
-          <div className="portal-scroll-indicator">
-            Continue Scrolling
-            <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'center' }}>
-              <svg className="down-arrow-svg" viewBox="0 0 24 24" fill="none" style={{ width: '18px', height: '18px' }}>
-                <path d="M7 13l5 5 5-5M7 6l5 5 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+        {!isAdvancedDisabled && (
+          <div 
+            className="portal-title-overlay"
+            style={{
+              opacity: portalTitleOpacity,
+              transform: `translate(-50%, calc(-50% + ${portalTitleTranslateY}px))`,
+              pointerEvents: portalTitleOpacity > 0.1 ? 'auto' : 'none'
+            }}
+          >
+            <h1 className="portal-title">ENTER THE AI DIMENSION</h1>
+            <div className="portal-scroll-indicator">
+              Continue Scrolling
+              <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'center' }}>
+                <svg className="down-arrow-svg" viewBox="0 0 24 24" fill="none" style={{ width: '18px', height: '18px' }}>
+                  <path d="M7 13l5 5 5-5M7 6l5 5 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Temporary sector entrance overlays */}
-      {overlaySector && (
+      {!isAdvancedDisabled && overlaySector && (
         <div key={overlaySector.title} className="sector-entrance-overlay">
           <div className="sector-entrance-content">
             <span className="sector-entrance-label">{overlaySector.label}</span>
@@ -231,6 +299,78 @@ function App() {
           techMeta={robotInfo.techMeta}
         />
       )}
+
+      {/* Temporary Diagnostic Debug Panel */}
+      <div className="debug-panel">
+        <div className="debug-panel-title">// Diagnostic Panel</div>
+        
+        <div className="debug-row">
+          <span className="debug-label">React App Loaded:</span>
+          <span className="debug-value yes">YES</span>
+        </div>
+        <div className="debug-row">
+          <span className="debug-label">Scene Mounted:</span>
+          <span className={`debug-value ${isSceneMounted ? 'yes' : 'no'}`}>
+            {isSceneMounted ? 'YES' : 'NO'}
+          </span>
+        </div>
+        <div className="debug-row">
+          <span className="debug-label">Canvas Created:</span>
+          <span className={`debug-value ${isCanvasCreated ? 'yes' : 'no'}`}>
+            {isCanvasCreated ? 'YES' : 'NO'}
+          </span>
+        </div>
+        <div className="debug-row">
+          <span className="debug-label">Camera Pos:</span>
+          <span className="debug-value" id="debug-cam-pos">
+            X: 0.00, Y: 0.00, Z: 5.80
+          </span>
+        </div>
+        <div className="debug-row">
+          <span className="debug-label">Scroll Progress:</span>
+          <span className="debug-value">
+            {(scrollProgress * 100).toFixed(1)}%
+          </span>
+        </div>
+        <div className="debug-row">
+          <span className="debug-label">Section:</span>
+          <span className="debug-value">
+            {sectorInfo[activeIndex]?.title || 'Space Gateway'}
+          </span>
+        </div>
+
+        {failedComponents.length > 0 && (
+          <div className="debug-failures">
+            <div className="debug-failures-title">FAILED COMPONENTS:</div>
+            <ul className="debug-failures-list">
+              {failedComponents.map((name) => (
+                <li key={name}>• {name}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div className="debug-buttons">
+          <button 
+            className={`debug-btn ${is3DDisabled ? 'active' : ''}`}
+            onClick={() => {
+              setIs3DDisabled((prev) => !prev);
+              if (!is3DDisabled) {
+                setIsSceneMounted(false);
+                setIsCanvasCreated(false);
+              }
+            }}
+          >
+            {is3DDisabled ? 'Enable 3D Scene' : 'Disable 3D Scene'}
+          </button>
+          <button 
+            className={`debug-btn ${isAdvancedDisabled ? 'active' : ''}`}
+            onClick={() => setIsAdvancedDisabled((prev) => !prev)}
+          >
+            {isAdvancedDisabled ? 'Enable Advanced Sections' : 'Disable Advanced Sections'}
+          </button>
+        </div>
+      </div>
     </>
   );
 }

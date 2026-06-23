@@ -1,8 +1,11 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 const Earth = ({ scrollProgress = 0 }) => {
+  useEffect(() => {
+    console.log("Earth Loaded");
+  }, []);
   const earthRef = useRef();
   const cloudsRef = useRef();
   const glowRef = useRef();

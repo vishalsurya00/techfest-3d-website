@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import Robot from './Robot';
@@ -158,6 +158,9 @@ const RoboticArm = ({ position = [0, 0, 0], angleOffset = 0, side = 1, labOpacit
 
 // Main RoboticsLab Component
 const RoboticsLab = ({ scrollProgress = 0, activeTerminalId = null, setActiveTerminalId, robotActive = false, setRobotActive }) => {
+  useEffect(() => {
+    console.log("Robotics Lab Loaded");
+  }, []);
   const conveyorBoxRef = useRef([]);
   const warningLightRef = useRef();
 
