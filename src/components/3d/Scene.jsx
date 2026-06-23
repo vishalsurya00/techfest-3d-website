@@ -32,21 +32,83 @@ const SceneContent = ({
   isShowTestObjects = false,
   cameraResetTrigger = 0,
   onLoad,
-  onWarning
+  onWarning,
+  failedComponents = [],
+  loadedCounts = {}
 }) => {
   const { camera, scene } = useThree();
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
+  const sectionGroupRef = useRef();
+
+  // Helper to determine if a section is failed or has not loaded yet
+  const isSectionInvalid = (secIndex) => {
+    const failed = failedComponents || [];
+    const loaded = loadedCounts || {};
+
+    const componentNames = [
+      [], // Hero
+      ['AI City'],
+      ['Robotics Lab'],
+      ['Quantum Hub'],
+      ['Innovation Gallery'],
+      ['Portal 2']
+    ];
+
+    // Check if failed
+    const isFailed = componentNames[secIndex].some(name => failed.includes(name));
+    if (isFailed) return true;
+
+    // Check if loaded
+    if (secIndex === 1 && !loaded.aiCity) return true;
+    if (secIndex === 2 && !loaded.robotics) return true;
+    if (secIndex === 3 && !loaded.quantumHub) return true;
+    if (secIndex === 4 && !loaded.innovationGallery) return true;
+    if (secIndex === 5 && !loaded.portal) return true;
+
+    return false;
+  };
+
+  // Helper to get safe clamped scroll progress
+  const getSafeScrollProgress = (scrollVal) => {
+    const thresholds = [0.1667, 0.3333, 0.50, 0.6667, 0.8333, 1.0];
+    
+    // Determine what target section this scrollVal falls into
+    let targetSec = 0;
+    for (let i = 0; i < thresholds.length; i++) {
+      if (scrollVal <= thresholds[i]) {
+        targetSec = i;
+        break;
+      }
+    }
+
+    // Check if any section from 0 up to targetSec is invalid
+    let safeSec = 0;
+    for (let i = 0; i <= targetSec; i++) {
+      if (isSectionInvalid(i)) {
+        break; // Stop before this invalid section
+      }
+      safeSec = i;
+    }
+
+    if (safeSec < targetSec) {
+      return thresholds[safeSec];
+    }
+    return scrollVal;
+  };
+
+  const safeScrollProgress = getSafeScrollProgress(scrollProgress);
+
   // Define progress variables in outer scope to resolve ReferenceErrors in JSX
-  const heroProgress = Math.min(1, Math.max(0, scrollProgress * 6.0));
-  const cityProgress = Math.min(1, Math.max(0, (scrollProgress - 0.1667) * 6.0));
-  const labProgress = Math.min(1, Math.max(0, (scrollProgress - 0.3333) * 6.0));
+  const heroProgress = Math.min(1, Math.max(0, safeScrollProgress * 6.0));
+  const cityProgress = Math.min(1, Math.max(0, (safeScrollProgress - 0.1667) * 6.0));
+  const labProgress = Math.min(1, Math.max(0, (safeScrollProgress - 0.3333) * 6.0));
 
   // Custom clock tracking local time progression (pauses when modal is active)
   const timeRef = useRef(0);
 
   // Smooth scroll tracking to slow down all scroll-driven camera transitions
-  const smoothScroll = useRef(scrollProgress);
+  const smoothScroll = useRef(safeScrollProgress);
 
   // Smooth lookAt target tracking
   const currentLookAt = useRef(new THREE.Vector3(0, 0, -6.0));
@@ -97,125 +159,62 @@ const SceneContent = ({
     const time = timeRef.current;
 
     // Derive per-section progress for sub-components (6 sections) used inside loop
-    const p = smoothScroll.current;
-    const cityProgress = Math.min(1, Math.max(0, (p - 0.1667) * 6.0));
-    const labProgress = Math.min(1, Math.max(0, (p - 0.3333) * 6.0));
+    const safeScrollFrame = getSafeScrollProgress(scrollProgress);
+    const scrollTrackingSpeed = 1.6; 
+    smoothScroll.current = THREE.MathUtils.lerp(
+      smoothScroll.current,
+      safeScrollFrame,
+      1 - Math.exp(-scrollTrackingSpeed * delta)
+    );
+    const pCurrent = smoothScroll.current;
+
+    // Calculate parent group Z translation (brings active section to Z ~ 0)
+    const sectionZOffsets = [0, 60, 120, 190, 260, 320];
+    const segmentZ = pCurrent * 5.0; // 0 to 5
+    const idxZ = Math.min(4, Math.floor(segmentZ));
+    const fracZ = segmentZ - idxZ;
+    
+    const groupZOffset = THREE.MathUtils.lerp(sectionZOffsets[idxZ], sectionZOffsets[idxZ + 1], fracZ);
+
+    if (sectionGroupRef.current) {
+      sectionGroupRef.current.position.z = groupZOffset;
+    }
 
     if (!isCameraAnimDisabled) {
-      // 0.5. Smooth scroll progress (slowing transitions by 40%)
-      const scrollTrackingSpeed = 1.6; 
-      smoothScroll.current = THREE.MathUtils.lerp(
-        smoothScroll.current,
-        scrollProgress,
-        1 - Math.exp(-scrollTrackingSpeed * delta)
-      );
-      const pCurrent = smoothScroll.current;
+      // Define camera positions for each section (all Z between 6.0 and 8.0, all Y between 0.0 and 1.5)
+      const sectionCamPositions = [
+        new THREE.Vector3(0, 0.0, 8.0),   // Hero start
+        new THREE.Vector3(0, 0.5, 6.0),   // Hero end / AI City start
+        new THREE.Vector3(0, 1.5, 7.5),   // AI City end / Robotics start
+        new THREE.Vector3(0, 0.0, 7.0),   // Robotics end / Quantum start
+        new THREE.Vector3(0, 1.0, 8.0),   // Quantum end / Gallery start
+        new THREE.Vector3(0, 1.0, 7.5),   // Gallery end / Final Portal start
+        new THREE.Vector3(0, 0.5, 8.0)    // Final Portal end
+      ];
 
-      // 1. Camera Positions & Targets — five-phase scroll timeline
+      const segmentCam = pCurrent * 6.0; // 6 segments (0 to 6)
+      const idxCam = Math.min(5, Math.floor(segmentCam));
+      const fracCam = segmentCam - idxCam;
+
       let scrollCamPos = new THREE.Vector3();
+      scrollCamPos.lerpVectors(sectionCamPositions[idxCam], sectionCamPositions[idxCam + 1], fracCam);
+
+      // Define camera lookAt targets for each section (all Z around -5.0 / -6.0)
+      const sectionTargets = [
+        new THREE.Vector3(0, 0.0, -6.0),    // Hero
+        new THREE.Vector3(0, -3.0, -5.0),   // AI City
+        new THREE.Vector3(0, -1.8, -5.0),   // Robotics Lab
+        new THREE.Vector3(0, 0.0, -5.0),    // Quantum Hub
+        new THREE.Vector3(0, -0.5, -5.0),   // Gallery
+        new THREE.Vector3(0, 0.0, -6.0)     // Final Portal
+      ];
+
+      const segmentTarget = pCurrent * 5.0; // 5 segments (0 to 5)
+      const idxTarget = Math.min(4, Math.floor(segmentTarget));
+      const fracTarget = segmentTarget - idxTarget;
+
       let scrollLookAt = new THREE.Vector3();
-      let shakeIntensity = 0;
-
-      // Fog color anchors
-      const spaceColor = new THREE.Color('#05020a');
-      const portalColor = new THREE.Color('#09041a');
-      const cityFogColor = new THREE.Color('#0a0520');
-      const labFogColor = new THREE.Color('#080b18');
-      const hubFogColor = new THREE.Color('#030107');
-      const galleryFogColor = new THREE.Color('#040212');
-
-      let currentFogColor = new THREE.Color();
-      let currentFogDensity = 0.0018;
-
-      if (pCurrent <= 0.1667) {
-        // ---- PHASE 1: Space Gateway (Hero) ----
-        const t = THREE.MathUtils.smoothstep(pCurrent, 0.0, 0.1667);
-        const z = THREE.MathUtils.lerp(5.8, 1.2, t);
-        scrollCamPos.set(0, 0, z);
-        scrollLookAt.set(0, 0, -6.0);
-
-        const shakeP = THREE.MathUtils.smoothstep(pCurrent, 0.03, 0.15);
-        shakeIntensity = Math.sin(shakeP * Math.PI) * 0.022;
-
-        currentFogColor.lerpColors(spaceColor, portalColor, t);
-        currentFogDensity = THREE.MathUtils.lerp(0.0018, 0.005, t);
-
-      } else if (pCurrent > 0.1667 && pCurrent <= 0.3333) {
-        // ---- PHASE 2: AI City ----
-        const t = THREE.MathUtils.smoothstep(pCurrent, 0.1667, 0.3333);
-        const z = THREE.MathUtils.lerp(1.2, -38.0, t);
-        const y = THREE.MathUtils.lerp(0, 8.0, t);
-        scrollCamPos.set(0, y, z);
-
-        const lookY = THREE.MathUtils.lerp(0, -3.0, t);
-        const lookZ = THREE.MathUtils.lerp(-6.0, -60.0, t);
-        scrollLookAt.set(0, lookY, lookZ);
-
-        const shakeP2 = THREE.MathUtils.smoothstep(pCurrent, 0.1667, 0.24);
-        shakeIntensity = Math.sin(shakeP2 * Math.PI) * 0.015;
-
-        currentFogColor.lerpColors(portalColor, cityFogColor, t);
-        currentFogDensity = THREE.MathUtils.lerp(0.005, 0.008, t);
-
-      } else if (pCurrent > 0.3333 && pCurrent <= 0.50) {
-        // ---- PHASE 3: Robotics Lab ----
-        const t = THREE.MathUtils.smoothstep(pCurrent, 0.3333, 0.50);
-        const z = THREE.MathUtils.lerp(-38.0, -112.5, t);
-        const y = THREE.MathUtils.lerp(8.0, -1.5, t);
-        scrollCamPos.set(0, y, z);
-
-        const lookY = THREE.MathUtils.lerp(-3.0, -1.8, t);
-        const lookZ = THREE.MathUtils.lerp(-60.0, -120.0, t);
-        scrollLookAt.set(0, lookY, lookZ);
-
-        const shakeP3 = THREE.MathUtils.smoothstep(pCurrent, 0.3333, 0.42);
-        shakeIntensity = Math.sin(shakeP3 * Math.PI) * 0.01;
-
-        currentFogColor.lerpColors(cityFogColor, labFogColor, t);
-        currentFogDensity = THREE.MathUtils.lerp(0.008, 0.011, t);
-
-      } else if (pCurrent > 0.50 && pCurrent <= 0.6667) {
-        // ---- PHASE 4: Quantum Hub ----
-        const t = THREE.MathUtils.smoothstep(pCurrent, 0.50, 0.6667);
-        const z = THREE.MathUtils.lerp(-112.5, -177.0, t);
-        const y = THREE.MathUtils.lerp(-1.5, 3.5, t);
-        scrollCamPos.set(0, y, z);
-
-        const lookY = THREE.MathUtils.lerp(-1.8, 0.0, t);
-        const lookZ = THREE.MathUtils.lerp(-120.0, -190.0, t);
-        scrollLookAt.set(0, lookY, lookZ);
-
-        currentFogColor.lerpColors(labFogColor, hubFogColor, t);
-        currentFogDensity = THREE.MathUtils.lerp(0.011, 0.008, t);
-
-      } else if (pCurrent > 0.6667 && pCurrent <= 0.8333) {
-        // ---- PHASE 5: Innovation Gallery ----
-        const t = THREE.MathUtils.smoothstep(pCurrent, 0.6667, 0.8333);
-        const z = THREE.MathUtils.lerp(-177.0, -248.0, t);
-        const y = THREE.MathUtils.lerp(3.5, 4.0, t);
-        scrollCamPos.set(0, y, z);
-
-        const lookY = THREE.MathUtils.lerp(0.0, -0.5, t);
-        const lookZ = THREE.MathUtils.lerp(-190.0, -260.0, t);
-        scrollLookAt.set(0, lookY, lookZ);
-
-        currentFogColor.lerpColors(hubFogColor, galleryFogColor, t);
-        currentFogDensity = THREE.MathUtils.lerp(0.008, 0.006, t);
-
-      } else {
-        // ---- PHASE 6: Final Portal ----
-        const t = THREE.MathUtils.smoothstep(pCurrent, 0.8333, 1.0);
-        const z = THREE.MathUtils.lerp(-248.0, -315.0, t);
-        const y = THREE.MathUtils.lerp(4.0, 1.5, t);
-        scrollCamPos.set(0, y, z);
-
-        const lookY = THREE.MathUtils.lerp(-0.5, 0.0, t);
-        const lookZ = THREE.MathUtils.lerp(-260.0, -325.0, t);
-        scrollLookAt.set(0, lookY, lookZ);
-
-        currentFogColor.lerpColors(galleryFogColor, portalColor, t);
-        currentFogDensity = THREE.MathUtils.lerp(0.006, 0.004, t);
-      }
+      scrollLookAt.lerpVectors(sectionTargets[idxTarget], sectionTargets[idxTarget + 1], fracTarget);
 
       // 1.5. Calculate Zoom Camera Position and Target if selected
       let zoomCamPos = new THREE.Vector3();
@@ -228,8 +227,8 @@ const SceneContent = ({
         const islandZ = -190 + Math.sin(angle) * orbitRadius;
         const islandY = -1.0 + Math.sin(time * 1.5 + activeIslandId) * 0.35 + 0.4;
 
-        zoomCamPos.set(islandX * 0.58, islandY + 1.0, islandZ + 4.2);
-        zoomLookAt.set(islandX, islandY, islandZ);
+        zoomCamPos.set(islandX * 0.58, islandY + 1.0, islandZ + 4.2 + groupZOffset);
+        zoomLookAt.set(islandX, islandY, islandZ + groupZOffset);
       } else if (activeCubeId !== null) {
         const orbitRadius = 8.0;
         const angle = (activeCubeId / 8) * Math.PI * 2;
@@ -237,25 +236,25 @@ const SceneContent = ({
         const cubeZ = -260 + Math.sin(angle) * orbitRadius;
         const cubeY = Math.sin(time * 1.0 + activeCubeId * 0.8) * 0.18;
 
-        zoomCamPos.set(cubeX * 0.62, cubeY + 1.2, cubeZ + 4.0);
-        zoomLookAt.set(cubeX, cubeY, cubeZ);
+        zoomCamPos.set(cubeX * 0.62, cubeY + 1.2, cubeZ + 4.0 + groupZOffset);
+        zoomLookAt.set(cubeX, cubeY, cubeZ + groupZOffset);
       } else if (activeNodeId !== null) {
-        zoomCamPos.set(0, -4.5 + 2.0, -60 + 9.0);
-        zoomLookAt.set(0, -4.5, -60);
+        zoomCamPos.set(0, -4.5 + 2.0, -60 + 9.0 + groupZOffset);
+        zoomLookAt.set(0, -4.5, -60 + groupZOffset);
       } else if (activeTerminalId !== null) {
         if (activeTerminalId === 0) {
-          zoomCamPos.set(-3.6, -3.4 + 1.2, -116.5 + 4.0);
-          zoomLookAt.set(-3.6, -3.4, -116.5);
+          zoomCamPos.set(-3.6, -3.4 + 1.2, -116.5 + 4.0 + groupZOffset);
+          zoomLookAt.set(-3.6, -3.4, -116.5 + groupZOffset);
         } else if (activeTerminalId === 1) {
-          zoomCamPos.set(0, -3.4 + 1.2, -115.0 + 4.0);
-          zoomLookAt.set(0, -3.4, -115.0);
+          zoomCamPos.set(0, -3.4 + 1.2, -115.0 + 4.0 + groupZOffset);
+          zoomLookAt.set(0, -3.4, -115.0 + groupZOffset);
         } else if (activeTerminalId === 2) {
-          zoomCamPos.set(3.6, -3.4 + 1.2, -116.5 + 4.0);
-          zoomLookAt.set(3.6, -3.4, -116.5);
+          zoomCamPos.set(3.6, -3.4 + 1.2, -116.5 + 4.0 + groupZOffset);
+          zoomLookAt.set(3.6, -3.4, -116.5 + groupZOffset);
         }
       } else if (robotActive) {
-        zoomCamPos.set(0, -1.8 + 1.5, -120 + 4.8);
-        zoomLookAt.set(0, -1.8 + 0.5, -120);
+        zoomCamPos.set(0, -1.8 + 1.5, -120 + 4.8 + groupZOffset);
+        zoomLookAt.set(0, -1.8 + 0.5, -120 + groupZOffset);
       }
 
       // 1.6. Interpolate between Scroll Camera and Zoom Camera (with ease-in-out)
@@ -283,13 +282,6 @@ const SceneContent = ({
       camera.position.y += (targetCamPos.y + targetCamY - camera.position.y) * lerpFactor;
       camera.position.z += (targetCamPos.z - camera.position.z) * lerpFactor;
 
-      // 3. Screen Shake
-      if (shakeIntensity > 0) {
-        camera.position.x += (Math.random() - 0.5) * shakeIntensity;
-        camera.position.y += (Math.random() - 0.5) * shakeIntensity;
-        camera.position.z += (Math.random() - 0.5) * shakeIntensity * 0.5;
-      }
-
       // 4. Orient camera to look at target
       currentLookAt.current.lerp(finalLookAt, lerpFactor);
       const tiltedLookAt = new THREE.Vector3().copy(currentLookAt.current);
@@ -301,11 +293,6 @@ const SceneContent = ({
         tiltedLookAt.set(0, 0, 0);
       }
       camera.lookAt(tiltedLookAt);
-
-      if (scene.fog) {
-        scene.fog.color.copy(currentFogColor);
-        scene.fog.density = currentFogDensity;
-      }
     } else {
       // If camera animations are disabled, ensure the camera looks at the current look-at target
       const targetLook = currentLookAt.current ? currentLookAt.current : new THREE.Vector3(0, 0, 0);
@@ -314,6 +301,26 @@ const SceneContent = ({
       }
       camera.lookAt(targetLook);
     }
+
+    // Safety Bounds Check (Before Clamping)
+    const isOutOfBounds = 
+      camera.position.x < -10 || camera.position.x > 10 ||
+      camera.position.y < -5 || camera.position.y > 5 ||
+      camera.position.z < 2 || camera.position.z > 12;
+
+    if (isOutOfBounds) {
+      if (onWarning) {
+        onWarning("Camera Out Of Bounds");
+      }
+      camera.position.set(0, 0, 8);
+      currentLookAt.current.set(0, 0, 0);
+      camera.lookAt(0, 0, 0);
+    }
+
+    // Strict clamping of camera coordinates
+    camera.position.x = Math.max(-10, Math.min(10, camera.position.x));
+    camera.position.y = Math.max(-5, Math.min(5, camera.position.y));
+    camera.position.z = Math.max(2, Math.min(12, camera.position.z));
 
     const camPosEl = document.getElementById('debug-cam-pos');
     if (camPosEl) {
@@ -367,65 +374,68 @@ const SceneContent = ({
         </group>
       )}
 
-      {/* Earth Group (contains Earth mesh and the spaceship) — uses heroProgress */}
-      <group>
-        <ThreeErrorBoundary name="Earth" onCrash={onCrash} position={[-3.8, -0.2, 0]}>
-          <Earth scrollProgress={heroProgress} onLoad={onLoad} onWarning={onWarning} />
+      {/* Translated Section Group */}
+      <group ref={sectionGroupRef}>
+        {/* Earth Group (contains Earth mesh and the spaceship) — uses heroProgress */}
+        <group>
+          <ThreeErrorBoundary name="Earth" onCrash={onCrash} position={[-3.8, -0.2, 0]}>
+            <Earth scrollProgress={heroProgress} onLoad={onLoad} onWarning={onWarning} />
+          </ThreeErrorBoundary>
+          <ThreeErrorBoundary name="Spaceship" onCrash={onCrash}>
+            <Spaceship scrollProgress={heroProgress} />
+          </ThreeErrorBoundary>
+        </group>
+
+        {/* 3D Glowing Portal — first portal */}
+        <ThreeErrorBoundary name="Portal 1" onCrash={onCrash} position={[0, 0, -6.0]}>
+          <Portal scrollProgress={safeScrollProgress} position={[0, 0, -6.0]} isFinal={false} onLoad={onLoad} onWarning={onWarning} />
         </ThreeErrorBoundary>
-        <ThreeErrorBoundary name="Spaceship" onCrash={onCrash}>
-          <Spaceship scrollProgress={heroProgress} />
+
+        {/* 3D Glowing Portal — second/final portal at Z = -320 */}
+        <ThreeErrorBoundary name="Portal 2" onCrash={onCrash} position={[0, 0, -320.0]}>
+          <Portal scrollProgress={safeScrollProgress} position={[0, 0, -320.0]} isFinal={true} onLoad={onLoad} onWarning={onWarning} />
         </ThreeErrorBoundary>
+
+        {/* 3D AI City — uses raw scrollProgress for opacity timing */}
+        <ThreeErrorBoundary name="AI City" onCrash={onCrash} position={[0, -4.5, -60]}>
+          <AICity scrollProgress={safeScrollProgress} activeNodeId={activeNodeId} setActiveNodeId={setActiveNodeId} onLoad={onLoad} onWarning={onWarning} />
+        </ThreeErrorBoundary>
+
+        {/* 3D Robotics Lab — uses raw scrollProgress for transition/fading */}
+        <ThreeErrorBoundary name="Robotics Lab" onCrash={onCrash} position={[0, -4.8, -120]}>
+          <RoboticsLab scrollProgress={safeScrollProgress} activeTerminalId={activeTerminalId} setActiveTerminalId={setActiveTerminalId} robotActive={robotActive} setRobotActive={setRobotActive} onLoad={onLoad} onWarning={onWarning} />
+        </ThreeErrorBoundary>
+
+        {/* 3D Quantum Innovation Hub — uses raw scrollProgress for fading */}
+        <ThreeErrorBoundary name="Quantum Hub" onCrash={onCrash} position={[0, 0, -190]}>
+          <QuantumHub scrollProgress={safeScrollProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} onLoad={onLoad} onWarning={onWarning} />
+        </ThreeErrorBoundary>
+
+        {/* 3D Innovation Gallery — uses raw scrollProgress for fading */}
+        <ThreeErrorBoundary name="Innovation Gallery" onCrash={onCrash} position={[0, 0, -260]}>
+          <InnovationGallery scrollProgress={safeScrollProgress} activeCubeId={activeCubeId} setActiveCubeId={setActiveCubeId} onLoad={onLoad} onWarning={onWarning} />
+        </ThreeErrorBoundary>
+
+        {/* City overhead ambient light — fades in during city phase, fades out in lab phase */}
+        <pointLight
+          position={[0, 15, -60]}
+          color="#00f0ff"
+          intensity={cityProgress * (1.0 - labProgress) * 8}
+          distance={80}
+          decay={2}
+        />
+        <pointLight
+          position={[0, -5, -60]}
+          color="#bd00ff"
+          intensity={cityProgress * (1.0 - labProgress) * 4}
+          distance={60}
+          decay={2}
+        />
       </group>
 
-      {/* 3D Glowing Portal — first portal */}
-      <ThreeErrorBoundary name="Portal 1" onCrash={onCrash} position={[0, 0, -6.0]}>
-        <Portal scrollProgress={scrollProgress} position={[0, 0, -6.0]} isFinal={false} onLoad={onLoad} onWarning={onWarning} />
-      </ThreeErrorBoundary>
-
-      {/* 3D Glowing Portal — second/final portal at Z = -320 */}
-      <ThreeErrorBoundary name="Portal 2" onCrash={onCrash} position={[0, 0, -320.0]}>
-        <Portal scrollProgress={scrollProgress} position={[0, 0, -320.0]} isFinal={true} onLoad={onLoad} onWarning={onWarning} />
-      </ThreeErrorBoundary>
-
-      {/* 3D AI City — uses raw scrollProgress for opacity timing */}
-      <ThreeErrorBoundary name="AI City" onCrash={onCrash} position={[0, -4.5, -60]}>
-        <AICity scrollProgress={scrollProgress} activeNodeId={activeNodeId} setActiveNodeId={setActiveNodeId} onLoad={onLoad} onWarning={onWarning} />
-      </ThreeErrorBoundary>
-
-      {/* 3D Robotics Lab — uses raw scrollProgress for transition/fading */}
-      <ThreeErrorBoundary name="Robotics Lab" onCrash={onCrash} position={[0, -4.8, -120]}>
-        <RoboticsLab scrollProgress={scrollProgress} activeTerminalId={activeTerminalId} setActiveTerminalId={setActiveTerminalId} robotActive={robotActive} setRobotActive={setRobotActive} onLoad={onLoad} onWarning={onWarning} />
-      </ThreeErrorBoundary>
-
-      {/* 3D Quantum Innovation Hub — uses raw scrollProgress for fading */}
-      <ThreeErrorBoundary name="Quantum Hub" onCrash={onCrash} position={[0, 0, -190]}>
-        <QuantumHub scrollProgress={scrollProgress} activeIslandId={activeIslandId} setActiveIslandId={setActiveIslandId} onLoad={onLoad} onWarning={onWarning} />
-      </ThreeErrorBoundary>
-
-      {/* 3D Innovation Gallery — uses raw scrollProgress for fading */}
-      <ThreeErrorBoundary name="Innovation Gallery" onCrash={onCrash} position={[0, 0, -260]}>
-        <InnovationGallery scrollProgress={scrollProgress} activeCubeId={activeCubeId} setActiveCubeId={setActiveCubeId} onLoad={onLoad} onWarning={onWarning} />
-      </ThreeErrorBoundary>
-
       {/* Background starfield and nebula — uses raw scrollProgress, computes heroPhase internally */}
-      <Starfield scrollProgress={scrollProgress} />
-      <Nebula scrollProgress={scrollProgress} />
-
-      {/* City overhead ambient light — fades in during city phase, fades out in lab phase */}
-      <pointLight
-        position={[0, 15, -60]}
-        color="#00f0ff"
-        intensity={cityProgress * (1.0 - labProgress) * 8}
-        distance={80}
-        decay={2}
-      />
-      <pointLight
-        position={[0, -5, -60]}
-        color="#bd00ff"
-        intensity={cityProgress * (1.0 - labProgress) * 4}
-        distance={60}
-        decay={2}
-      />
+      <Starfield scrollProgress={safeScrollProgress} />
+      <Nebula scrollProgress={safeScrollProgress} />
     </>
   );
 };
@@ -450,7 +460,9 @@ const Scene = ({
   isShowTestObjects = false,
   cameraResetTrigger = 0,
   onLoad,
-  onWarning
+  onWarning,
+  failedComponents = [],
+  loadedCounts = {}
 }) => {
   const isModalOpen = activeCubeId !== null || activeIslandId !== null || activeNodeId !== null || activeTerminalId !== null || robotActive;
 
@@ -493,6 +505,8 @@ const Scene = ({
           cameraResetTrigger={cameraResetTrigger}
           onLoad={onLoad}
           onWarning={onWarning}
+          failedComponents={failedComponents}
+          loadedCounts={loadedCounts}
         />
       </Canvas>
     </div>

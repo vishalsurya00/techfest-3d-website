@@ -179,6 +179,8 @@ function App() {
             cameraResetTrigger={cameraResetTrigger}
             onLoad={handleObjectLoad}
             onWarning={handleWarning}
+            failedComponents={failedComponents}
+            loadedCounts={loadedCounts}
           />
         </ErrorBoundary>
       )}
