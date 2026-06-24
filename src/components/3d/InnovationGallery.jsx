@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import TechCube from './TechCube';
@@ -176,11 +176,7 @@ const CentralPlatform = ({ opacity = 1.0, isPaused = false }) => {
   );
 };
 
-const InnovationGallery = ({ scrollProgress = 0, activeCubeId = null, setActiveCubeId, onLoad, onWarning }) => {
-  useEffect(() => {
-    console.log("Innovation Gallery Loaded");
-    if (onLoad) onLoad('innovationGallery');
-  }, [onLoad]);
+const InnovationGallery = ({ scrollProgress = 0, activeCubeId = null, setActiveCubeId }) => {
   const isPaused = activeCubeId !== null;
 
   // Gallery fades in during its scroll phase (6-section layout: 0.6667 to 0.8333)

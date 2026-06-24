@@ -11,10 +11,7 @@ class ThreeErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error(`Error caught in 3D component [${this.props.name}]:`, error, errorInfo);
-    if (this.props.onCrash) {
-      this.props.onCrash(this.props.name);
-    }
+    console.error(`Error in 3D component [${this.props.name}]:`, error, errorInfo);
   }
 
   render() {

@@ -1,8 +1,8 @@
-import React, { useRef, useMemo, useEffect } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const Earth = ({ scrollProgress = 0, onLoad, onWarning }) => {
+const Earth = ({ scrollProgress = 0 }) => {
   const earthRef = useRef();
   const cloudsRef = useRef();
   const glowRef = useRef();
@@ -169,13 +169,7 @@ const Earth = ({ scrollProgress = 0, onLoad, onWarning }) => {
     }
   }, []);
 
-  useEffect(() => {
-    console.log("Earth Loaded");
-    if (onLoad) onLoad('earth');
-    if (error && onWarning) {
-      onWarning(`Earth textures failed to generate: ${error.message}`);
-    }
-  }, [onLoad, onWarning, error]);
+
 
   const [earthTexture, specularMap, cloudsTexture] = textures;
 

@@ -1,12 +1,8 @@
-import React, { useRef, useMemo, useEffect } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const Portal = ({ scrollProgress = 0, position = [0, 0, -6.0], isFinal = false, onLoad, onWarning }) => {
-  useEffect(() => {
-    console.log("Portal Loaded");
-    if (onLoad) onLoad('portal');
-  }, [onLoad]);
+const Portal = ({ scrollProgress = 0, position = [0, 0, -6.0], isFinal = false }) => {
   const portalRef = useRef();
   const discRef = useRef();
   const pointsRef = useRef();
@@ -128,14 +124,7 @@ const Portal = ({ scrollProgress = 0, position = [0, 0, -6.0], isFinal = false, 
     }
   }, []);
 
-  useEffect(() => {
-    if (shaderError && onWarning) {
-      onWarning(`Portal shader failed: ${shaderError.message}`);
-    }
-    if (textureError && onWarning) {
-      onWarning(`Portal particle texture failed: ${textureError.message}`);
-    }
-  }, [shaderError, textureError, onWarning]);
+
 
   // 4. Frame animation loop
   useFrame((state) => {

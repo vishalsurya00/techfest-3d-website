@@ -7,7 +7,6 @@ const Spaceship = ({ scrollProgress = 0 }) => {
   const trailPointsRef = useRef();
 
   useEffect(() => {
-    console.log("Spaceship Loaded");
     if (trailPointsRef.current) {
       trailPointsRef.current.geometry.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), 1000);
     }

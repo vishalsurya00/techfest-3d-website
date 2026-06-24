@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import Drone from './Drone';
@@ -7,11 +7,7 @@ import EnergyRoad from './EnergyRoad';
 import AICore from './AICore';
 
 
-const AICity = ({ scrollProgress = 0, activeNodeId = null, setActiveNodeId, onLoad, onWarning }) => {
-  useEffect(() => {
-    console.log("AI City Loaded");
-    if (onLoad) onLoad('aiCity');
-  }, [onLoad]);
+const AICity = ({ scrollProgress = 0, activeNodeId = null, setActiveNodeId }) => {
   // 1. Calculate opacity fade-in and fade-out based on scroll progress
   const cityOpacity = useMemo(() => {
     const fadeIn = THREE.MathUtils.smoothstep(scrollProgress, 0.08, 0.1667);
@@ -125,7 +121,6 @@ const AICity = ({ scrollProgress = 0, activeNodeId = null, setActiveNodeId, onLo
         `
       });
     } catch (err) {
-      if (onWarning) onWarning(`Skyscraper shader failed: ${err.message}`);
       return new THREE.MeshBasicMaterial({ color, transparent: true, opacity: cityOpacity });
     }
   };

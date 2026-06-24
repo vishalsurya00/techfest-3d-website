@@ -11,10 +11,7 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error(`Error caught in HTML component [${this.props.name}]:`, error, errorInfo);
-    if (this.props.onCrash) {
-      this.props.onCrash(this.props.name);
-    }
+    console.error(`Error in [${this.props.name}]:`, error, errorInfo);
   }
 
   render() {
@@ -23,34 +20,21 @@ class ErrorBoundary extends React.Component {
         <div style={{
           padding: '24px',
           margin: '20px',
-          border: '2px dashed #ff0055',
+          border: '1px solid rgba(0, 240, 255, 0.2)',
           borderRadius: '12px',
-          background: 'rgba(255, 0, 85, 0.12)',
+          background: 'rgba(5, 2, 10, 0.8)',
           color: '#ffffff',
           fontFamily: 'var(--font-cyber)',
           textAlign: 'center',
-          boxShadow: '0 0 20px rgba(255, 0, 85, 0.2)',
           backdropFilter: 'blur(10px)',
           pointerEvents: 'auto'
         }}>
-          <h3 style={{ fontSize: '18px', color: '#ff0055', marginBottom: '8px', letterSpacing: '2px' }}>
-            // ERROR: {this.props.name.toUpperCase()} CRASHED
+          <h3 style={{ fontSize: '16px', color: 'var(--primary-glow)', marginBottom: '8px', letterSpacing: '2px' }}>
+            SYSTEM RECALIBRATING
           </h3>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'rgba(255, 255, 255, 0.8)', margin: '0 0 12px 0' }}>
-            The component failed to render. Diagnostic logs have been captured.
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', margin: 0 }}>
+            This module encountered an issue. Please refresh the page.
           </p>
-          <pre style={{
-            background: 'rgba(0, 0, 0, 0.4)',
-            padding: '12px',
-            borderRadius: '6px',
-            fontSize: '11px',
-            color: '#ff3b30',
-            textAlign: 'left',
-            overflowX: 'auto',
-            margin: '0'
-          }}>
-            {this.state.error?.toString()}
-          </pre>
         </div>
       );
     }

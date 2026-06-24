@@ -6,8 +6,6 @@ const Navbar = () => {
 
   const handleLinkClick = (e, item) => {
     e.preventDefault();
-    console.log(`Navigating to ${item}`);
-    // Optional: add tech audio effect or custom transition here
   };
 
   return (
